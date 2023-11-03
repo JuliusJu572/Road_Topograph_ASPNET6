@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Road Topograph</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .user-icon {
+            width: 30px; /* 设置图像的宽度 */
+            height: auto; /* 自动计算高度以保持纵横比 */
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .active-link {
+            background-color: #977356;
+            color: white;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 ">
+            <div class="container-fluid">
+                <a class="navbar-brand rounded" asp-area="" asp-controller="Map" asp-action="BaiduMap" style="background-color: #977356; color: white; padding: 5px 10px;">Road Topograph</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="ml-auto">
+                    <a class="nav-link text-dark" style="padding-left: 100px; padding-right: 550px; vertical-align: bottom;">
+                        <img src="~/用户.png" class="user-icon">
+                        用户：XXX
+                    </a>
+                </div>
+                <div class="navbar-nav flex-grow-1">
+                    <a class="nav-link @(ViewData["SelectedNavItem"] == "BaiduMap" ? "active-link text-white" : "text-dark")" asp-area="" asp-controller="Map" asp-action="BaiduMap">Topo Visualize</a>
+                    <a class="nav-link text-dark @(ViewData["SelectedNavItem"] == "InfraData" ? "active-link  text-white" : "text-dark")" asp-area="" asp-controller="Map" asp-action="InfraData">Infrastructure Data</a>
+                    <a class="nav-link text-dark @(ViewData["SelectedNavItem"] == "SystemSettings" ? "active-link  text-white" : "text-dark")" asp-area="" asp-controller="Map" asp-action="SystemSettings">System Settings</a>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - Road Topograph - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+<script>
+    // 获取所有nav-item元素
+    const navItems = document.querySelectorAll('.navbar-nav .nav-item');
+
+    // 为每个nav-item添加点击事件处理程序
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // 移除其他nav-item的active类
+            navItems.forEach(otherItem => {
+                otherItem.classList.remove('active');
+            });
+
+            // 将当前点击的nav-item添加active类
+            item.classList.add('active');
+        });
+    });
+</script>

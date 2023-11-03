@@ -1,0 +1,757 @@
+﻿@using Microsoft.AspNetCore.Antiforgery
+@using RoadAppWEB.Models.ViewModel;
+@model FacilityRoadNode
+@inject IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "BaiduMap";
+}
+
+<div id="image-toolbar" style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex;">
+        <a href="#" class="toolbar-icon" id="add-icon" data-tooltip="添加">
+            <img src="~/加.png">
+        </a>
+
+        <form asp-controller="Map" asp-action="NodeDelete" method="post">
+            <input type="hidden" name="id" id="delete-node-id" />
+            <a href="#" class="toolbar-icon" id="delete-icon" data-tooltip="删除" onclick="prepareDelete();">
+                <img src="~/删除.png">
+            </a>
+        </form>
+
+        <input type="hidden" name="id" id="edit-node-id" />
+        <a href="#" class="toolbar-icon" id="edit-icon" data-tooltip="编辑">
+            <img src="~/_修改订单.png">
+        </a>
+
+        <a href="#" class="toolbar-icon" id="import-icon" data-tooltip="导入">
+            <img src="~/导入.png">
+        </a>
+
+        <input type="file" id="file-input" style="display: none;" accept=".xlsx">
+        <label for="file-input" id="file-label" style="display: none;"></label>
+
+        <a href="#" class="toolbar-icon" id="export-icon2" data-tooltip="导出">
+            <img src="~/导出.png">
+        </a>
+
+        <a href="#" class="toolbar-icon" id="delete-all-icon" data-tooltip="全部删除">
+            <img src="~/全部删除.png">
+        </a>
+
+        <a href="#" class="toolbar-icon" id="addSegments-icon" data-tooltip="批量添加">
+            <img src="~/加.png">
+        </a>
+    </div>
+    <!-- 搜索栏放在右侧 -->
+    <form asp-controller="Map" asp-action="BaiduMap" method="get" style="display: flex; align-items: center;">
+        <input type="text" id="search-input" name="site" placeholder="Search...">
+        <button type="submit" style="background: none; border: none; padding: 0;">
+            <img src="~/搜索.png" alt="Search" style="width: 20px; height: 20px;">
+            <span class="tooltiptext">Search</span>
+        </button>
+    </form>
+</div>
+
+
+<div id="container" style="width: 100%; height: 800px;"></div>
+
+<div id="node-select-container" class="rounded-box">
+    <!-- Render the Create partial view and pass the collection of facilities -->
+    @await Html.PartialAsync("facility-tree-partial", Model.Roads)
+</div>
+<div id="node-create-container" class="rounded-box" style="display: none;">
+    <!-- Render the Create partial view and pass the collection of nodes -->
+    @Html.Partial("NodeCreate", Model.Nodes)
+</div>
+<div id="node-createRoadSegments-container" class="rounded-box" style="display: none;">
+    <!-- Render the Create partial view and pass the collection of nodes -->
+    @Html.Partial("CreateRoadSegments", Model.Nodes)
+</div>
+<div id="node-edit-container" class="rounded-box" style="display: none;">
+    <!-- Render the Create partial view and pass the collection of nodes -->
+    @Html.Partial("NodeEdit", Model.Nodes.First())
+</div>
+
+<style type="text/css">
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    #search-bar {
+        float: right; /* 使用浮动将搜索栏和图标放置在右侧 */
+        margin-right: 20px; /* 可以调整右边距以控制与其他元素的间距 */
+    }
+
+    #search-input {
+        width: 250px; /* 设置搜索输入框的宽度 */
+        border-radius: 10px; /* 调整这个值以设置圆角的大小 */
+    }
+
+    #search-icon {
+        margin-left: 5px; /* 设置搜索图标与输入框之间的间距 */
+    }
+
+    .rounded-box {
+        border-radius: 10px; /* 调整这个值以设置圆角的大小 */
+        padding: 10px; /* 可选：添加内边距以增加内容与边框之间的间隔 */
+        border: 1px solid #ccc; /* 可选：添加边框 */
+        background-color: #f7f7f7; /* 可选：设置背景颜色 */
+    }
+
+    /* 样式用于容器 div，可以根据需要调整大小和样式 */
+    #container {
+        position: relative; /* 让子元素相对于这个容器定位 */
+        width: 100%;
+        height: 800px;
+        background-color: lightblue; /* 设置容器的背景颜色，可根据需要调整 */
+    }
+    /* 样式用于 div-create-container，覆盖在 container 上方 */
+    #node-create-container {
+        position: absolute; /* 设置为绝对定位，相对于父容器定位 */
+        top: 30%; /* 将容器的顶部定位到父容器中间 */
+        left: 75%;
+        width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
+        height: auto; /* 或者设置为100%，根据内容自动调整高度 */
+        background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
+        z-index: 9999; /* 设置堆叠顺序高于 container */
+        display: none; /* 默认隐藏，根据需要显示 */
+    }
+
+    #node-edit-container {
+        position: absolute; /* 设置为绝对定位，相对于父容器定位 */
+        top: 30%; /* 将容器的顶部定位到父容器中间 */
+        left: 75%;
+        width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
+        height: auto; /* 或者设置为100%，根据内容自动调整高度 */
+        background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
+        z-index: 9999; /* 设置堆叠顺序高于 container */
+        display: none; /* 默认隐藏，根据需要显示 */
+    }
+
+    #node-select-container {
+        position: absolute; /* 设置为绝对定位，相对于父容器定位 */
+        top: 30%; /* 将容器的顶部定位到父容器中间 */
+        left: 10%;
+        width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
+        height: auto; /* 或者设置为100%，根据内容自动调整高度 */
+        background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
+        z-index: 9999; /* 设置堆叠顺序高于 container */
+    }
+
+    #node-createRoadSegments-container {
+        position: absolute; /* 设置为绝对定位，相对于父容器定位 */
+        top: 30%; /* 将容器的顶部定位到父容器中间 */
+        left: 70%;
+        width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
+        height: auto; /* 或者设置为100%，根据内容自动调整高度 */
+        background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
+        z-index: 9999; /* 设置堆叠顺序高于 container */
+        display: none; /* 默认隐藏，根据需要显示 */
+    }
+
+    #container {
+        height: 100%;
+        background-color: #F2F2F2; /* Light gray background */
+    }
+
+    /* Button styles for future enhancements */
+    .action-button {
+        background-color: #007BFF; /* Blue button background */
+        color: #FFF; /* White button text */
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    /* Custom tooltip styles */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        margin-right: 10px; /* Add some spacing between icons */
+    }
+
+        .tooltip:hover .tooltiptext {
+            display: block;
+        }
+
+    .tooltiptext {
+        display: none;
+        position: absolute;
+        background-color: #000; /* Black background color */
+        color: #fff; /* White text color */
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 30px; /* Increase the font size to 30px */
+        top: -50px; /* Adjust the distance from the icon to display above it */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* Style for the image icons */
+    .toolbar-icon img {
+        width: 20px; /* Set the image width to 40px */
+        height: 20px; /* Set the image height to 40px */
+    }
+
+    .toolbar-icon {
+        position: relative; /* 设置相对定位，以便定位伪元素 */
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+        .toolbar-icon::after {
+            content: attr(data-tooltip); /* 设置伪元素的内容 */
+            position: absolute;
+            bottom: 100%; /* 位于图标的上方 */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333; /* 提示文本背景颜色 */
+            color: #fff; /* 提示文本颜色 */
+            padding: 5px 10px; /* 提示文本内边距 */
+            border-radius: 4px;
+            white-space: nowrap; /* 防止文本换行 */
+            opacity: 0; /* 初始状态下不可见 */
+            pointer-events: none; /* 防止干扰点击 */
+            transition: opacity 0.2s; /* 添加渐变效果 */
+        }
+
+        .toolbar-icon:hover::after {
+            opacity: 1; /* 悬停时显示提示文本 */
+        }
+
+
+        /* Style for the active state of the "Add" icon */
+        .toolbar-icon.active {
+            background-color: gray; /* Change to the desired gray color */
+        }
+
+    /* Add some padding and background color to the toolbar */
+    #image-toolbar {
+        background-color: #F2F2F2;
+        padding: 10px; /* Add padding around the icons */
+    }
+
+    .facility-list {
+        max-height: 300px; /* 设置最大高度，超出部分将出现滚动条 */
+        overflow-y: auto; /* 显示垂直滚动条 */
+    }
+    /* 隐藏默认的子树结构 */
+    .road-list {
+        display: none;
+    }
+    /* Style the tree nodes */
+    .tree-node {
+        display: flex;
+        align-items: center;
+    }
+    /* 初始状态下隐藏所有类型为type-list的子树 */
+    .type-list {
+        display: none;
+    }
+
+    /* 样式化可折叠图标 */
+    .tree-icon {
+        width: 10px; /* 设置图标的宽度 */
+        height: 10px; /* 设置图标的高度 */
+        cursor: pointer; /* 鼠标光标样式为手型 */
+    }
+
+        /* 设置图标的初始状态为向右箭头 */
+        .tree-icon[data-expanded="true"] {
+            content: url('arrow-down-bold.png'); /* 切换图标为展开状态的图标 */
+        }
+
+        /* 设置图标的初始状态为向下箭头 */
+        .tree-icon[data-expanded="false"] {
+            content: url('arrow-right-bold.png'); /* 切换图标为折叠状态的图标 */
+        }
+
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=QthnnfM1uNcKBFT3IrE10UdyXG7uSK3k"></script>
+<script type="text/javascript">
+    // GetParameters
+    const nodeCreateContainer = document.getElementById("node-create-container");
+    const nodeCreateSegmentsContainer = document.getElementById("node-createRoadSegments-container")
+    const nodeEditContainer = document.getElementById("node-edit-container");
+    const addIcon = document.getElementById("add-icon");
+    const deleteIcon = document.getElementById("delete-icon");
+    const addSegmentsIcon = document.getElementById("addSegments-icon");
+    const editIcon = document.getElementById("edit-icon");
+    const importIcon = document.getElementById("import-icon");
+    const searchIcon = document.getElementById("search-icon");
+    const searchInput = document.getElementById("search-input");
+
+    var fileInput = document.getElementById("file-input");
+    var fileLabel = document.getElementById("file-label");
+    var fileExport = document.getElementById("file-export");
+    var fileSite = document.getElementById("file-site");
+
+    var nodes = @Html.Raw(Json.Serialize(Model.Nodes));
+    var facilities = @Html.Raw(Json.Serialize(Model.Facilities));
+    var roads = @Html.Raw(Json.Serialize(Model.Roads));
+    var facility_list = []; // 创建一个新的数组
+    for (var i = 0; i < facilities.length; i++) {
+        var facilityId = facilities[i].id;
+        facility_list.push(facilityId); // 将facilityId添加到数组中
+    }
+    var nodeDictionary = {}; // 创建节点字典以便通过ID查找节点坐标  id:(longitude, latitude)
+    var routeTable = {}; // 创建路由表，存储父节点到子节点的映射 id:id
+    var selectedNode = "";
+    var greenMarker = new BMapGL.Icon("MarkerGreen.png", new BMapGL.Size(25, 25), {
+        anchor: new BMapGL.Size(10, 25),
+    });
+    var blueMarker = new BMapGL.Icon("MarkerBlue.png", new BMapGL.Size(25, 25), {
+        anchor: new BMapGL.Size(10, 25),
+    });
+    var darkblueMarker = new BMapGL.Icon("MarkerDarkBlue.png", new BMapGL.Size(25, 25), {
+        anchor: new BMapGL.Size(10, 25),
+    });
+    var pinkMarker = new BMapGL.Icon("MarkerPink.png", new BMapGL.Size(25, 25), {
+        anchor: new BMapGL.Size(10, 25),
+    });
+    var redMarker = new BMapGL.Icon("MarkerRed.png", new BMapGL.Size(25, 25), {
+        anchor: new BMapGL.Size(10, 25),
+    });
+    var yellowMarker = new BMapGL.Icon("MarkerYellow.png", new BMapGL.Size(25, 25), {
+        anchor: new BMapGL.Size(10, 25),
+    });
+    // GetParameters
+
+    // MapSettings
+    var map = new BMapGL.Map("container");
+    var site = "@ViewData["site"]";
+    map.centerAndZoom(site, 13);
+    map.enableScrollWheelZoom(true);
+    var opts = {
+        offset: new BMapGL.Size(150, 5)
+    }
+    map.addControl(new BMapGL.ScaleControl(opts));
+    var zoomCtrl = new BMapGL.ZoomControl();
+    map.addControl(zoomCtrl);
+    map.setMapStyleV2({
+        styleId: '1a40647694017bcfc33ba2b48e15b105'
+    });
+    // MapSettings
+
+    // Test Examples
+    //var points = [
+    //    new BMapGL.Point(121.255683, 31.382652),
+    //    new BMapGL.Point(121.561367, 31.298901)
+    //    // Add more points here as needed
+    //];
+    //var labels = [
+    //    '上大嘉定',
+    //    '上理工'
+    //    // Add more labels here as needed
+    //];
+    //for (var i = 0; i < points.length; i++) {
+    //    var marker = new BMapGL.Marker(points[i]);
+    //    map.addOverlay(marker);
+    //    var label = new BMapGL.Label(labels[i], {
+    //        position: points[i],
+    //        offset: new BMapGL.Size(10, 10)
+    //    })
+    //    label.setStyle({
+    //        color: '#759879',
+    //        fontSize: '18px',
+    //        border: '1px solid #1a2e1c'
+    //    });
+    //    map.addOverlay(label);
+    //}
+    //var coordinates = [
+    //    new BMapGL.Point(121.558484, 31.296332),
+    //    new BMapGL.Point(121.558888, 31.296525),
+    //    new BMapGL.Point(121.559454, 31.29688),
+    //    new BMapGL.Point(121.559966, 31.297173),
+    //    new BMapGL.Point(121.560667, 31.297544),
+    //    new BMapGL.Point(121.561439, 31.298084),
+    //    new BMapGL.Point(121.562376, 31.298612),
+    //    new BMapGL.Point(121.562785, 31.298901)
+    //];
+    //for (var i = 0; i < coordinates.length; i++) {
+    //    var marker = new BMapGL.Marker(coordinates[i]);
+    //    map.addOverlay(marker);
+    //}
+    //var polyline = new BMapGL.Polyline(coordinates, {
+    //    strokeColor: "blue",
+    //    strokeWeight: 3,
+    //    strokeOpacity: 0.7
+    //});
+    //map.addOverlay(polyline);
+    // Test Examples
+
+    // Buttons
+    // Add Mode
+    var isAddMode = false;
+    var isEditMode = false;
+    var isAddSegmentsMode = false;
+    // Function to toggle the add mode
+    function changeAddMode() {
+        isAddMode = !isAddMode;
+        // Toggle the visibility of the node-create-container
+        nodeCreateContainer.style.display = isAddMode ? "block" : "none";
+    }
+    // Add a click event listener to the add-icon
+    addIcon.addEventListener("click", changeAddMode);
+
+
+    var selectStartCoordinatesButton = document.getElementById("select-start-coordinates");
+    var selectEndCoordinatesButton = document.getElementById("select-end-coordinates");
+    var isStartCoordinatesButton = false;
+    var isEndCoordinatesButton = false;
+    addSegmentsIcon.addEventListener("click", changeAddSegmentsModel);
+    function changeAddSegmentsModel() {
+        isAddSegmentsMode = !isAddSegmentsMode;
+        // Toggle the visibility of the node-create-container
+        nodeCreateSegmentsContainer.style.display = isAddSegmentsMode ? "block" : "none";
+    }
+    selectStartCoordinatesButton.addEventListener('click', function () {
+        if (isEndCoordinatesButton) {
+            isEndCoordinatesButton = !isEndCoordinatesButton;
+        }
+        isStartCoordinatesButton = true;
+    });
+    selectEndCoordinatesButton.addEventListener('click', function () {
+        if (isStartCoordinatesButton) {
+            isStartCoordinatesButton = !isStartCoordinatesButton;
+        }
+        isEndCoordinatesButton = true;
+    });
+
+
+    // Add a click event listener to the delete-icon
+    deleteIcon.addEventListener("click", prepareDelete);
+    // Add your map event listener here
+    map.addEventListener('click', function (e) {
+        if (isAddMode) {
+            console.log('点击的经纬度：' + e.latlng.lng + ', ' + e.latlng.lat);
+            var point = new BMapGL.Point(e.latlng.lng, e.latlng.lat)
+            var marker = new BMapGL.Marker(point, { icon: yellowMarker });
+            map.addOverlay(marker);
+
+            // 更新经度和纬度输入框的值
+            document.getElementById("longitude").value = e.latlng.lng;
+            document.getElementById("latitude").value = e.latlng.lat;
+            isAddMode = !isAddMode;
+        }
+        if (isAddSegmentsMode) {
+            var point = new BMapGL.Point(e.latlng.lng, e.latlng.lat)
+            var marker = new BMapGL.Marker(point, { icon: yellowMarker });
+            map.addOverlay(marker);
+            if (isStartCoordinatesButton) {
+                selectStartCoordinatesButton.textContent = e.latlng.lng + ", " + e.latlng.lat;
+                isStartCoordinatesButton = !isStartCoordinatesButton;
+            }
+            if (isEndCoordinatesButton) {
+                selectEndCoordinatesButton.textContent = e.latlng.lng + ", " + e.latlng.lat;
+                if (selectStartCoordinatesButton.textContent != "选择坐标") {
+                    var startPoint = new BMapGL.Point(selectStartCoordinatesButton.textContent.split(',')[0], selectStartCoordinatesButton.textContent.split(',')[1]);
+                    var endPoint = new BMapGL.Point(selectEndCoordinatesButton.textContent.split(',')[0], selectEndCoordinatesButton.textContent.split(',')[1]);
+                    var drivingRoute = new BMapGL.DrivingRouteLine(startPoint, {
+                        renderOptions: {
+                            map: map,
+                            autoViewport: true,
+                        },
+                    });
+                    drivingRoute.setPolicy({ policy: BMAP_DRIVING_POLICY_FIRST_HIGHWAYS });
+                    // 设置起始坐标
+                    startCoordinates = startPoint;
+
+                    // 启动路线规划
+                    drivingRoute.search(startPoint, endPoint);
+
+                    // 在onPolylinesSet回调中处理生成的DrivingRouteLine
+                    drivingRoute.setPolylinesSetCallback(function () {
+                        var results = drivingRoute.getResults();
+                        // 获取生成的DrivingRouteLine的polyline
+                        var plan = results.getPlan(0);
+
+                        var route = plan.getRoute(0);
+                        var routeNodes = route.points;
+                        var distance = plan.getDistance(false);
+                        var distanceNodes = 0;
+                        var segmentDistance = [];
+
+                        for (var i = 1; i < routeNodes.length; i++) {
+                            var tempDistance = map.getDistance(routeNodes[i - 1], routeNodes[i])
+                            segmentDistance.push(tempDistance);
+                            distanceNodes += tempDistance; // Corrected this line
+                        }
+                        // 计算均匀分布的节点
+                        var nodeNum = 6;
+                        var averageDistance = distanceNodes / (nodeNum - 1); // 减1是因为起点已知
+
+                        // 初始化已添加节点数
+                        var addedNum = 0;
+
+                        // 初始距离
+                        var currentDistance = 0;
+                        // 逐步添加节点
+                        for (var i = 1; i < routeNodes.length; i++) {
+                            while (currentDistance < segmentDistance[i - 1] && addedNum < nodeNum) {
+                                var fraction = currentDistance / segmentDistance[i - 1];
+                                var newLatitude = routeNodes[i - 1].lat + fraction * (routeNodes[i].lat - routeNodes[i - 1].lat);
+                                var newLongitude = routeNodes[i - 1].lng + fraction * (routeNodes[i].lng - routeNodes[i - 1].lng);
+                                var point = new BMapGL.Point(newLongitude, newLatitude);
+                                console.log(point);
+                                var marker = new BMapGL.Marker(point, { icon: pinkMarker });
+                                map.addOverlay(marker);
+                                currentDistance += averageDistance;
+                                addedNum++;
+                            }
+                            currentDistance -= segmentDistance[i - 1];
+                        }
+                    });
+                }
+
+                isEndCoordinatesButton = !isEndCoordinatesButton;
+            }
+        }
+    });
+    // Buttons
+
+    // Read Node Data
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        var point = new BMapGL.Point(node.longitude, node.latitude);
+
+        // 查找与 node.road_id 相关的 road
+        var road = roads.find(function (r) {
+            return r.id === node.road_id;
+        });
+
+        var marker;
+
+        if (road) {
+            if (road.type === "主线") {
+                marker = new BMapGL.Marker(point, { icon: darkblueMarker });
+            } else if (road.type === "匝道") {
+                marker = new BMapGL.Marker(point, { icon: blueMarker });
+            } else {
+                marker = new BMapGL.Marker(point, { icon: pinkMarker });
+            }
+        } else {
+            // 未找到相关的 road，使用默认处理方式
+            marker = new BMapGL.Marker(point, { icon: darkblueMarker });
+        }
+
+        var nodeTip = "节点名称:" + node.id + "\n所属路段:" + node.road_id;
+        marker.setTitle(nodeTip);
+        marker.enableClicking = true;
+        map.addOverlay(marker);
+
+        // 创建节点字典
+        nodeDictionary[node.id] = point;
+
+        // 创建监听事件
+        marker.addEventListener("click", function () {
+            var marker = this;
+            if (marker.getIcon() == redMarker) {
+                marker.setIcon(greenMarker);
+            }
+            else {
+                marker.setIcon(redMarker);
+            }
+            var title = marker.getTitle();
+            selectedNode = title;
+        });
+    }
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        // 处理父子节点关系并更新路由表
+        if (node.childnode) { // 检查 childnode 是否为 null
+            var childNodeIds = node.childnode.split(';'); // 将子节点字符串拆分为数组
+            for (var j = 0; j < childNodeIds.length; j++) {
+                var childNodeId = childNodeIds[j];
+                // 更新路由表
+                if (!routeTable[node.id]) {
+                    routeTable[node.id] = [];
+                }
+                routeTable[node.id].push(childNodeId);
+            }
+        }
+    }
+
+    // 现在你有了路由表，可以使用它来绘制连线
+    for (var parentId in routeTable) {
+        if (routeTable.hasOwnProperty(parentId)) {
+            var parentPoint = nodeDictionary[parentId];
+
+            if (parentPoint) {
+                var childNodeIds = routeTable[parentId]; // 将子节点字符串拆分为数组
+                for (var j = 0; j < childNodeIds.length; j++) {
+                    // 检查 childNodeIds[j] 是否存在于 nodeDictionary
+                    if (nodeDictionary[childNodeIds[j]]) {
+                        // 创建连线
+                        var polyline = new BMapGL.Polyline([parentPoint, nodeDictionary[childNodeIds[j]]], {
+                            strokeColor: "white",
+                            strokeWeight: 3,
+                            strokeOpacity: 0.7
+                        });
+                        map.addOverlay(polyline);
+                    }
+                }
+            }
+        }
+    }
+    // Read Node Data
+
+    // 删除事件
+    function prepareDelete() {
+        document.getElementById("delete-node-id").value = selectedNode;
+        // 提交表单以执行删除操作
+        document.forms[0].submit();
+    }
+
+    // 添加编辑节点按钮的点击事件
+    editIcon.addEventListener("click", function (e) {
+        e.preventDefault(); // 防止按钮的默认行为
+
+        // 检查是否选择了节点
+        if (!selectedNode) {
+            alert("请先选择节点！");
+        } else {
+            fetch(`/Map/GetSelectedNode?id=${encodeURIComponent(selectedNode)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 处理获取到的数据对象
+                    var id = data.id;
+                    var hubnode = data.hubnode;
+                    var fathernode = data.fathernode;
+                    var childnode = data.childnode;
+                    var roadname = data.road_id;
+                    var level = data.level;
+                    var longitude = data.longitude;
+                    var latitude = data.latitude;
+
+                    // 输出属性值
+                    console.log("ID: " + id);
+                    console.log("Hub Node: " + hubnode);
+                    console.log("Father Node: " + fathernode);
+                    console.log("Child Node: " + childnode);
+                    console.log("Road Name: " + roadname);
+                    console.log("Level: " + level);
+                    console.log("Longitude: " + longitude);
+                    console.log("Latitude: " + latitude);
+
+                    // 将获取到的编辑页面内容插入到编辑容器中
+                    var editContainer = document.getElementById("node-edit-container");
+                    // 更新经度和纬度输入框的值
+                    document.getElementById("nodeEditID").value = id;
+                    document.getElementById("nodeEditHubnode").value = hubnode;
+                    document.getElementById("nodeEditFathernode").value = fathernode;
+                    document.getElementById("nodeEditChildnode").value = childnode;
+                    document.getElementById("nodeEditRoadID").value = roadname;
+                    document.getElementById("nodeEditLevel").value = level;
+                    document.getElementById("nodeEditLongitude").value = longitude;
+                    document.getElementById("nodeEditLatitude").value = latitude;
+                    // 显示编辑容器
+                    editContainer.style.display = "block";
+                })
+                .catch(error => {
+                    console.error("获取选定节点的编辑页面出错：" + error);
+                    // 在发生错误时可以添加适当的错误处理逻辑
+                });
+        }
+    });
+
+    // 导入节点按钮的点击事件
+    // 添加点击事件监听器到导入按钮
+    importIcon.addEventListener("click", function (e) {
+        // 触发文件上传input元素的点击事件
+        fileInput.click();
+    });
+
+    // 添加change事件监听器到文件上传input元素
+    fileInput.addEventListener("change", function () {
+        // 获取选择的文件
+        var selectedFile = fileInput.files[0];
+
+        if (selectedFile) {
+            // 创建FormData对象，用于发送文件数据
+            var formData = new FormData();
+            formData.append("file", selectedFile);
+
+            // 发送文件到C#后台
+            fetch("/Map/UploadFile", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // 在此处处理C#后台返回的数据，可以输出xlsx的每一列
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        }
+    });
+
+    $(document).ready(function () {
+        // 默认隐藏所有子树结构
+        $(".road-list").hide();
+
+        // 点击图标时展开/折叠子树
+        $(".facility-node .tree-icon").click(function () {
+            var childTree = $(this).closest("li").find(".type-list");
+            childTree.slideToggle();
+
+            // 切换图标
+            $(this).attr("src", function (index, attr) {
+                return attr.endsWith("arrow-right-bold.png") ? "arrow-down-bold.png" : "arrow-right-bold.png";
+            });
+        });
+        // 点击图标时展开/折叠子树
+        $(".type-node .tree-icon").click(function () {
+            var childTree = $(this).closest("li").find(".road-list");
+            childTree.slideToggle();
+
+            // 切换图标
+            $(this).attr("src", function (index, attr) {
+                return attr.endsWith("arrow-right-bold.png") ? "arrow-down-bold.png" : "arrow-right-bold.png";
+            });
+        });
+    });
+
+    document.getElementById("export-icon2").addEventListener("click", function () {
+        // 使用 JavaScript 来执行下载操作
+        window.location.href = "/Map/DownloadFile";
+    });
+
+    document.getElementById("delete-all-icon").addEventListener("click", function (event) {
+        event.preventDefault(); // 阻止默认行为（跳转）
+
+        // 弹出确认框
+        var confirmed = confirm("当前操作将删除所有节点，请慎用！");
+        if (confirmed) {
+            // 用户点击确认，执行操作
+            deleteAllNodes();
+        }
+    });
+
+    function deleteAllNodes() {
+        // 发送 AJAX 请求到后台 Controller 执行操作
+        // 这里使用 jQuery 的 AJAX 方法，您可以使用其他方法根据您的项目配置
+        $.ajax({
+            url: '/Map/DeleteAllNodes', // 替换为您的 Controller 路由
+            type: 'POST', // 根据需要使用 POST 或 GET
+            success: function (data) {
+                alert("操作已执行");
+            },
+            error: function (error) {
+                alert("操作失败");
+            }
+        });
+    }
+</script>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadAppWEB", "RoadAppWEB.csproj", "{EF7461B5-8CA6-49F3-ADF6-CE01373859E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF7461B5-8CA6-49F3-ADF6-CE01373859E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF7461B5-8CA6-49F3-ADF6-CE01373859E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF7461B5-8CA6-49F3-ADF6-CE01373859E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF7461B5-8CA6-49F3-ADF6-CE01373859E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FCA1E46A-1E87-4F71-A307-E3809ECC1423}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<RoadAppWEB.Models.node>
+
+@{
+    ViewData["PartialTitle"] = "NodeCreate";
+}
+
+@{
+    var node = new RoadAppWEB.Models.node(); // Create an empty instance of the model type
+}
+<div class="row">
+    <div class="col-md-4" style="width: auto;height: auto;">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@node.id" class="control-label"></label>
+                <input asp-for="@node.id" class="form-control" />
+                <span asp-validation-for="@node.id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.hubnode" class="control-label"></label>
+                <input asp-for="@node.hubnode" class="form-control" />
+                <span asp-validation-for="@node.hubnode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.fathernode" class="control-label"></label>
+                <input asp-for="@node.fathernode" class="form-control" />
+                <span asp-validation-for="@node.fathernode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.childnode" class="control-label"></label>
+                <input asp-for="@node.childnode" class="form-control" />
+                <span asp-validation-for="@node.childnode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.road_id" class="control-label"></label>
+                <input asp-for="@node.road_id" class="form-control" />
+                <span asp-validation-for="@node.road_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.level" class="control-label"></label>
+                <input asp-for="@node.level" class="form-control" />
+                <span asp-validation-for="@node.level" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.longitude" class="control-label"></label>
+                <input asp-for="@node.longitude" class="form-control" id="longitude" />
+                <span asp-validation-for="@node.longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.latitude" class="control-label"></label>
+                <input asp-for="@node.latitude" class="form-control" id="latitude" />
+                <span asp-validation-for="@node.latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@node.span" class="control-label"></label>
+                <input asp-for="@node.span" class="form-control" id="latitude" />
+                <span asp-validation-for="@node.span" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center" style="padding-top: 10px;">
+                <input type="submit" value="Create" class="btn btn-primary" style="background-color: #977356; color: white;" />
+            </div>
+
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

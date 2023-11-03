@@ -1,0 +1,64 @@
+﻿@model IEnumerable<RoadAppWEB.Models.node>
+
+@{
+    ViewData["PartialTitle"] = "CreateRoadSegments";
+}
+
+@{
+    var node = new RoadAppWEB.Models.node(); // Create an empty instance of the model type
+}
+
+<div class="row">
+    <div class="col-md-4" style="width: auto;height: auto;">
+        <form asp-action="CreateRoadSegments">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@node.road_id" class="control-label"></label>
+                <input asp-for="@node.road_id" class="form-control" />
+                <span asp-validation-for="@node.road_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">起始桩号</label>
+                <input asp-for="@node.id" class="form-control" />
+                <span asp-validation-for="@node.id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">起始桩号位置</label>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-primary" id="select-start-coordinates">选择坐标</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">起始桩号层级</label>
+                <input asp-for="@node.level" class="form-control" />
+                <span asp-validation-for="@node.level" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">终止桩号</label>
+                <input asp-for="@node.id" class="form-control" />
+                <span asp-validation-for="@node.id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">终止桩号位置</label>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-primary" id="select-end-coordinates">选择坐标</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">终止桩号层级</label>
+                <input asp-for="@node.level" class="form-control" />
+                <span asp-validation-for="@node.level" class="text-danger"></span>
+            </div>
+
+            <div class="form-group text-center" style="padding-top: 10px;">
+                <input type="submit" value="Create" class="btn btn-primary" style="background-color: #977356; color: white;" />
+            </div>
+
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

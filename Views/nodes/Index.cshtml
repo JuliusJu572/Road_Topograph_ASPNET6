@@ -1,0 +1,86 @@
+﻿@model IEnumerable<RoadAppWEB.Models.node>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form asp-controller="nodes" asp-action="Index" method="get">
+    <p>
+        Title: <input type="text" name="SearchString" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.hubnode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.fathernode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.childnode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.road_id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.level)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.longitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.latitude)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.hubnode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.fathernode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.childnode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.road_id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.level)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.longitude)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.latitude)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

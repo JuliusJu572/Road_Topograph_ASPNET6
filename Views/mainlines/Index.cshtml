@@ -1,0 +1,65 @@
+﻿@model IEnumerable<RoadAppWEB.Models.mainline>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.viaduct_id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.direction)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.avg_length)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartNode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndNode)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <th>
+                @Html.DisplayFor(modelItem => item.id)
+            </th>
+            <td>
+                @Html.DisplayFor(modelItem => item.viaduct_id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.direction)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.avg_length)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartNode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndNode)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

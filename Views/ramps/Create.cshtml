@@ -1,0 +1,73 @@
+﻿@model RoadAppWEB.Models.ramp
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ramp</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="id" class="control-label"></label>
+                <input asp-for="id" class="form-control" />
+                <span asp-validation-for="id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="viaduct_id" class="control-label"></label>
+                <input asp-for="viaduct_id" class="form-control" />
+                <span asp-validation-for="viaduct_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="overpass_id" class="control-label"></label>
+                <input asp-for="overpass_id" class="form-control" />
+                <span asp-validation-for="overpass_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="direction" class="control-label"></label>
+                <input asp-for="direction" class="form-control" />
+                <span asp-validation-for="direction" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="code" class="control-label"></label>
+                <input asp-for="code" class="form-control" />
+                <span asp-validation-for="code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="start_node" class="control-label"></label>
+                <input asp-for="start_node" class="form-control" />
+                <span asp-validation-for="start_node" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="end_node" class="control-label"></label>
+                <input asp-for="end_node" class="form-control" />
+                <span asp-validation-for="end_node" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="linknode" class="control-label"></label>
+                <input asp-for="linknode" class="form-control" />
+                <span asp-validation-for="linknode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="avg_length" class="control-label"></label>
+                <input asp-for="avg_length" class="form-control" />
+                <span asp-validation-for="avg_length" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

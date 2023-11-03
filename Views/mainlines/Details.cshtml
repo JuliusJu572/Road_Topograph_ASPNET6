@@ -1,0 +1,48 @@
+﻿@model RoadAppWEB.Models.mainline
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>mainline</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.viaduct_id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.viaduct_id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.direction)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.direction)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.avg_length)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.avg_length)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.StartNode)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.StartNode)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EndNode)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EndNode)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
