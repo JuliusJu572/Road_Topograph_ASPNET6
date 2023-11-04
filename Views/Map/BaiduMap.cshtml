@@ -533,7 +533,10 @@
         var marker;
 
         if (road) {
-            if (road.type === "主线") {
+            if (node.childnode.search(";") != -1 || node.fathernode.search(";") != -1) {
+                marker = new BMapGL.Marker(point, { icon: redMarker });
+            }
+            else if (road.type === "主线") {
                 marker = new BMapGL.Marker(point, { icon: darkblueMarker });
             } else if (road.type === "匝道") {
                 marker = new BMapGL.Marker(point, { icon: blueMarker });
@@ -545,7 +548,7 @@
             marker = new BMapGL.Marker(point, { icon: darkblueMarker });
         }
 
-        var nodeTip = "节点名称:" + node.id + "\n所属路段:" + node.road_id;
+        var nodeTip = "节点名称:" + node.id + "\n所属路段:" + node.road_id + "\n父节点:"+node.fathernode+"\n子节点:"+node.childnode;
         marker.setTitle(nodeTip);
         marker.enableClicking = true;
         map.addOverlay(marker);
@@ -690,10 +693,11 @@
                 .then(response => response.json())
                 .then(data => {
                     // 在此处处理C#后台返回的数据，可以输出xlsx的每一列
-                    console.log(data);
+                    alert("操作已执行");
                 })
                 .catch(error => {
                     console.error("Error:", error);
+                    alert("操作已执行");
                 });
         }
     });

@@ -1496,9 +1496,9 @@ namespace RoadAppWEB.Controllers
         {
             try
             {
-                
                 _context.Database.ExecuteSqlRaw("DELETE FROM node where id != 'JuRuibin00'");
                 _context.Database.ExecuteSqlRaw("DELETE FROM road");
+                _context.Database.ExecuteSqlRaw("DELETE FROM facility");
                 _context.Database.ExecuteSqlRaw("DELETE from HubNodeRes");
                 _context.Database.ExecuteSqlRaw("DELETE from AllNodesRes");
 
