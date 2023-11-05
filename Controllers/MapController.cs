@@ -23,6 +23,7 @@ using CsvHelper.Configuration;
 using System.IO;
 using OfficeOpenXml.Table;
 using System.Drawing;
+using System.Collections.Immutable;
 
 namespace RoadAppWEB.Controllers
 {
@@ -91,6 +92,7 @@ namespace RoadAppWEB.Controllers
                         where roadSelected.Contains(n.road_id)
                         select n;
             }
+            
             var roads = from r in _context.road
                         select r;
             var facilities = from f in _context.facility
@@ -102,8 +104,85 @@ namespace RoadAppWEB.Controllers
             }
             else
             {
-                ViewData["site"] = site;
+                if (site.Contains('；'))
+                {
+                    foreach (string s in site.Split('；'))
+                    {
+                        // 设施
+                        var selectedFacilityData = _context.facility.FirstOrDefault(facility => facility.id == s);
+                        
+                        if (selectedFacilityData!=null)
+                        {
+                            // 查询所有符合条件的道路
+                            var roadList = (from r in _context.road
+                                            where r.facility_id == selectedFacilityData.id
+                                            select r.id).ToList();
+
+                            // 查询所有节点，其中 road_id 在 roadList 中或等于 selectedFacility
+                            var tempNodes = from n in _context.node
+                                            where roadList.Contains(n.road_id)
+                                            select n;
+                            nodes = nodes.Concat(tempNodes);
+
+                        }
+
+                        var selectedRoadData = _context.road.FirstOrDefault(road => road.id == s);
+                        // 道路
+                        if (selectedRoadData != null)
+                        {
+                            // 查询所有符合条件的道路
+                            var roadSelected = (from r in _context.road
+                                                where r.id == selectedRoadData.id
+                                                select r.id).ToList();
+
+                            // 查询所有节点，其中 road_id 在 roadSelected 中或等于 selectedFacility
+                            var tempNodes = from n in _context.node
+                                    where roadSelected.Contains(n.road_id)
+                                    select n;
+                            nodes = nodes.Concat(tempNodes);
+                        }
+                    }
+                }
+                else
+                {
+                    // 设施
+                    var selectedFacilityData = _context.facility.FirstOrDefault(facility => facility.id == site);
+
+                    // 检查是否找到了选定节点的数据
+                    if (selectedFacilityData != null)
+                    {
+                        // 查询所有符合条件的道路
+                        var roadList = (from r in _context.road
+                                        where r.facility_id == selectedFacilityData.id
+                                        select r.id).ToList();
+
+                        // 查询所有节点，其中 road_id 在 roadList 中或等于 selectedFacility
+                        var tempNodes = from n in _context.node
+                                        where roadList.Contains(n.road_id)
+                                        select n;
+                        nodes = nodes.Concat(tempNodes);
+
+                    }
+
+                    var selectedRoadData = _context.road.FirstOrDefault(road => road.id == site);
+                    // 道路
+                    if (selectedRoadData != null)
+                    {
+                        // 查询所有符合条件的道路
+                        var roadSelected = (from r in _context.road
+                                            where r.id == selectedRoadData.id
+                                            select r.id).ToList();
+
+                        // 查询所有节点，其中 road_id 在 roadSelected 中或等于 selectedFacility
+                        var tempNodes = from n in _context.node
+                                        where roadSelected.Contains(n.road_id)
+                                        select n;
+                        nodes = nodes.Concat(tempNodes);
+
+                    }
+                }
             }
+
             ViewData["SelectedNavItem"] = "BaiduMap";
             ViewData["facility"] = selectedFacility;
             ViewData["roads"] = selectedRoad;
