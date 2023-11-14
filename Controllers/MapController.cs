@@ -1440,7 +1440,7 @@ namespace RoadAppWEB.Controllers
 
         public async Task createHubNodeResFromList(List<HubNodeRes> hubNodeReses)
         {
-            if (hubNodeReses != null && hubNodeReses.Count > 0)
+             if (hubNodeReses != null && hubNodeReses.Count > 0)
             {
                 foreach (var res in hubNodeReses)
                 {
@@ -1485,8 +1485,9 @@ namespace RoadAppWEB.Controllers
             #region HubNodeResult.csv
             // HubNodeResult.csv
             // 获取 HubNodeRes 数据
-            var hubNodeResData = (from r in _context.HubNodeRes
-                                 select r).ToList();
+            var roadTemp = from r in _context.HubNodeRes select r;
+            var roadTempList = roadTemp.ToList();
+            var hubNodeResData = (from r in _context.HubNodeRes select r).ToList();
             // 定义 CSV 文件路径
             var fileName = "HubNodeResult.csv";
             var filePath = Path.Combine(wwwrootPath, fileName);
