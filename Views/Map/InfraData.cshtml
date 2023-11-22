@@ -1,7 +1,145 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Antiforgery
+@using RoadAppWEB.Models.ViewModel;
+@model FacilityRoadNode
+@inject IAntiforgery Antiforgery
+
+@{
     ViewData["Title"] = "Infrastructure Data";
 }
 
-<h2>Infrastructure Data</h2>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Tree Structure Column -->
+        <div class="col-md-3">
+            <div id="treeView">
+                <div id="node-select-container" class="rounded-box">
+                    <!-- Render the Create partial view and pass the collection of facilities -->
+                    @await Html.PartialAsync("facility-tree-partial", Model.Roads)
+                </div>  
+            </div>
+        </div>
 
-<p>Hello from our Infrastructure Data!</p>
+        <!-- Table Column -->
+        <div class="col-md-9">
+            <div id="tableView">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">序号</th>
+                            <th scope="col">地点名称</th>
+                            <th scope="col">所属辖区</th>
+                            <th scope="col">交通状况描述</th>
+                            <th scope="col">建设年份</th>
+                            <th scope="col">建设单位</th>
+                            <th scope="col">备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Your table data will be rendered here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    #tableView {
+        /* Add styles for your table view here */
+    }
+
+    .table {
+        margin-top: 20px;
+    }
+
+    .rounded-box {
+        border-radius: 10px; /* 调整这个值以设置圆角的大小 */
+        padding: 10px; /* 可选：添加内边距以增加内容与边框之间的间隔 */
+        border: 1px solid #ccc; /* 可选：添加边框 */
+        background-color: #f7f7f7; /* 可选：设置背景颜色 */
+    }
+
+    #node-select-container {
+        position: absolute; /* 设置为绝对定位，相对于父容器定位 */
+        top: 8%; /* 将容器的顶部定位到父容器中间 */
+        left: 1%;
+        width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
+        height: auto; /* 或者设置为100%，根据内容自动调整高度 */
+        background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
+        z-index: 9999; /* 设置堆叠顺序高于 container */
+    }
+
+    .facility-list {
+        max-height: 800px; /* 设置最大高度，超出部分将出现滚动条 */
+        overflow-y: auto; /* 显示垂直滚动条 */
+        max-width: 250px; /* 设置最大高度，超出部分将出现滚动条 */
+        overflow-x: auto; /* 显示垂直滚动条 */
+    }
+    /* 隐藏默认的子树结构 */
+    .road-list {
+        display: none;
+    }
+    /* Style the tree nodes */
+    .tree-node {
+        display: flex;
+        align-items: center;
+    }
+    /* 初始状态下隐藏所有类型为type-list的子树 */
+    .type-list {
+        display: none;
+    }
+
+    /* 样式化可折叠图标 */
+    .tree-icon {
+        width: 10px; /* 设置图标的宽度 */
+        height: 10px; /* 设置图标的高度 */
+        cursor: pointer; /* 鼠标光标样式为手型 */
+    }
+
+        /* 设置图标的初始状态为向右箭头 */
+        .tree-icon[data-expanded="true"] {
+            content: url('arrow-down-bold.png'); /* 切换图标为展开状态的图标 */
+        }
+
+        /* 设置图标的初始状态为向下箭头 */
+        .tree-icon[data-expanded="false"] {
+            content: url('arrow-right-bold.png'); /* 切换图标为折叠状态的图标 */
+        }
+
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // 默认隐藏所有子树结构
+        $(".road-list").hide();
+
+        // 点击图标时展开/折叠子树
+        $(".facility-node .tree-icon").click(function () {
+            var childTree = $(this).closest("li").find(".type-list");
+            childTree.slideToggle();
+
+            // 切换图标
+            $(this).attr("src", function (index, attr) {
+                return attr.endsWith("/arrow-right-bold.png") ? "/arrow-down-bold.png" : "/arrow-right-bold.png";
+            });
+        });
+        // 点击图标时展开/折叠子树
+        $(".type-node .tree-icon").click(function () {
+            var childTree = $(this).closest("li").find(".road-list");
+            childTree.slideToggle();
+
+            // 切换图标
+            $(this).attr("src", function (index, attr) {
+                return attr.endsWith("/arrow-right-bold.png") ? "/arrow-down-bold.png" : "/arrow-right-bold.png";
+            });
+        });
+    });
+</script>

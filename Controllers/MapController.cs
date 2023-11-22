@@ -24,6 +24,7 @@ using System.IO;
 using OfficeOpenXml.Table;
 using System.Drawing;
 using System.Collections.Immutable;
+using System.ComponentModel;
 
 namespace RoadAppWEB.Controllers
 {
@@ -197,9 +198,24 @@ namespace RoadAppWEB.Controllers
         }
 
 
-        public async Task<IActionResult> InfraData()
+        public async Task<IActionResult> InfraData(FacilityRoadNode viewModel)
         {
             ViewData["SelectedNavItem"] = "InfraData";
+            var roads = from r in _context.road
+                        select r;
+            var facilities = from f in _context.facility
+                             select f;
+
+
+            // 将节点和 Facility 数据存储在 viewModel 中
+            viewModel.Facilities = await facilities.ToListAsync();
+            viewModel.Roads = await roads.ToListAsync();
+
+            return View(viewModel);
+        }
+        public async Task<IActionResult> InfraStructure()
+        {
+            ViewData["SelectedNavItem"] = "InfraStructure";
             return View();
         }
         public async Task<IActionResult> SystemSettings()
@@ -408,7 +424,7 @@ namespace RoadAppWEB.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             if (file == null || file.Length == 0)
             {
                 return BadRequest("未选择文件或文件为空。");
@@ -1531,21 +1547,18 @@ namespace RoadAppWEB.Controllers
             #region Results.xlsx
             fileName = "Results.xlsx";
             filePath = Path.Combine(wwwrootPath, fileName);
-            if (System.IO.File.Exists(filePath) == false)
+            using (var package = new ExcelPackage(filePath))
             {
-                using (var package = new ExcelPackage(filePath))
-                {
-                    // 添加第一个工作表（HubNodeRes 数据）
-                    var worksheet1 = package.Workbook.Worksheets.Add("HubNodeRes");
-                    worksheet1.Cells.LoadFromCollection(hubNodeResData, true, TableStyles.Light9); // 第三个参数添加表头
+                // 添加第一个工作表（HubNodeRes 数据）
+                var worksheet1 = package.Workbook.Worksheets.Add("HubNodeRes");
+                worksheet1.Cells.LoadFromCollection(hubNodeResData, true, TableStyles.Light9); // 第三个参数添加表头
 
-                    // 添加第二个工作表（AllNodesRes 数据）
-                    var worksheet2 = package.Workbook.Worksheets.Add("AllNodesRes");
-                    worksheet2.Cells.LoadFromCollection(allNodeResData, true, TableStyles.Light9); // 第三个参数添加表头
+                // 添加第二个工作表（AllNodesRes 数据）
+                var worksheet2 = package.Workbook.Worksheets.Add("AllNodesRes");
+                worksheet2.Cells.LoadFromCollection(allNodeResData, true, TableStyles.Light9); // 第三个参数添加表头
 
-                    // 保存 Excel 文件
-                    package.Save();
-                }
+                // 保存 Excel 文件
+                package.Save();
             }
             #endregion
 

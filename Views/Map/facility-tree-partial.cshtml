@@ -4,20 +4,25 @@
     var addedFacilities = new List<string>();
 }
 
-<ul class="facility-list">
+<div id="structure-tree" class="demo-tree"></div>
+@*<ul class="facility-list">
     <li>
         <a href="@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "全部" })">
-            全部
+            全部显示
         </a>
     </li>
-
+    <li>
+        <a href="@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "" })">
+            取消显示
+        </a>
+    </li>
     @foreach (var road in Model)
     {
         @if (!string.IsNullOrWhiteSpace(road.facility_id) && !addedFacilities.Contains(road.facility_id))
         {
             <li>
                 <div class="facility-node">
-                    <img class="tree-icon" src="arrow-right-bold.png" alt="Expand" /> 
+                    <img class="tree-icon" src="~/arrow-right-bold.png" alt="Expand" /> 
                     <a href="@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = road.facility_id })">
                         @road.facility_id
                     </a>
@@ -27,7 +32,7 @@
                     <!-- 类型为主线的子树 -->
                     <li>
                         <div class="type-node">
-                            <img class="tree-icon" src="arrow-right-bold.png" alt="Expand" />
+                            <img class="tree-icon" src="~/arrow-right-bold.png" alt="Expand" />
                             <a href="@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = road.facility_id, selectedType = "主线" })">
                                 主线
                             </a>
@@ -46,7 +51,7 @@
                     <!-- 类型为匝道的子树 -->
                     <li>
                         <div class="type-node">
-                            <img class="tree-icon" src="arrow-right-bold.png" alt="Expand" /> <!-- 初始状态为右箭头 -->
+                            <img class="tree-icon" src="~/arrow-right-bold.png" alt="Expand" /> <!-- 初始状态为右箭头 -->
                             <a href="@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = road.facility_id, selectedType = "匝道" })">
                                 匝道
                             </a>
@@ -65,7 +70,7 @@
                     <!-- 类型为立交的子树 -->
                     <li>
                         <div class="type-node">
-                            <img class="tree-icon" src="arrow-right-bold.png" alt="Expand" /> <!-- 初始状态为右箭头 -->
+                            <img class="tree-icon" src="~/arrow-right-bold.png" alt="Expand" /> <!-- 初始状态为右箭头 -->
                             <a href="@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = road.facility_id, selectedType = "立交" })">
                                 立交
                             </a>
@@ -86,4 +91,4 @@
             addedFacilities.Add(road.facility_id);
         }
     }
-</ul>
+</ul>*@

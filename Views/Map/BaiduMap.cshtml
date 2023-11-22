@@ -55,7 +55,7 @@
 </div>
 
 
-<div id="container" style="width: 100%; height: 800px;"></div>
+<div id="container" style="width: 100%; height: 800px;display: flex; align-items: center; justify-content: space-between;"></div>
 
 <div id="node-select-container" class="rounded-box">
     <!-- Render the Create partial view and pass the collection of facilities -->
@@ -103,13 +103,6 @@
         background-color: #f7f7f7; /* 可选：设置背景颜色 */
     }
 
-    /* 样式用于容器 div，可以根据需要调整大小和样式 */
-    #container {
-        position: relative; /* 让子元素相对于这个容器定位 */
-        width: 100%;
-        height: 800px;
-        background-color: lightblue; /* 设置容器的背景颜色，可根据需要调整 */
-    }
     /* 样式用于 div-create-container，覆盖在 container 上方 */
     #node-create-container {
         position: absolute; /* 设置为绝对定位，相对于父容器定位 */
@@ -135,8 +128,8 @@
 
     #node-select-container {
         position: absolute; /* 设置为绝对定位，相对于父容器定位 */
-        top: 30%; /* 将容器的顶部定位到父容器中间 */
-        left: 10%;
+        top: 5%; /* 将容器的顶部定位到父容器中间 */
+        left: 1%;
         width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
         height: auto; /* 或者设置为100%，根据内容自动调整高度 */
         background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
@@ -239,9 +232,11 @@
         padding: 10px; /* Add padding around the icons */
     }
 
-    .facility-list {
-        max-height: 300px; /* 设置最大高度，超出部分将出现滚动条 */
+    .demo-tree {
+        max-height: 750px; /* 设置最大高度，超出部分将出现滚动条 */
         overflow-y: auto; /* 显示垂直滚动条 */
+        max-width: 275px; /* 设置最大高度，超出部分将出现滚动条 */
+        overflow-x: auto; /* 显示垂直滚动条 */
     }
     /* 隐藏默认的子树结构 */
     .road-list {
@@ -278,6 +273,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=QthnnfM1uNcKBFT3IrE10UdyXG7uSK3k"></script>
+<script src="~/lib/layui/layui.js"></script>
 <script type="text/javascript">
     // GetParameters
     const nodeCreateContainer = document.getElementById("node-create-container");
@@ -697,6 +693,7 @@
                 })
                 .catch(error => {
                     console.error("Error:", error);
+                    console.log(error);
                     alert("操作已执行");
                 });
         }
@@ -758,4 +755,81 @@
             }
         });
     }
+
+    layui.use(['tree', 'util'], function () {
+        var tree = layui.tree;
+        var data = [{ "title": "全部显示", "href": "@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "全部" })" },
+        { "title": "取消显示",  "href": "@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "" })"}]
+        for (var j = 0; j < facilities.length; j++) {
+            var facilityId = facilities[j].id;
+            var baiduMapUrl = '@Url.Action("BaiduMap", new { site = ViewData["site"] })';
+            var newData = {
+                "title": facilityId,
+                "href": baiduMapUrl + '&selectedFacility=' + facilityId,
+                "children":[]
+            };
+            var typeName = "主线";
+            var newTypeData = {
+                "title": typeName,
+                "href": baiduMapUrl + '&selectedFacility=' + facilityId + '&selectedType=' + typeName,
+                "children": []
+            }
+            for (var i = 0; i < roads.length; i++) {
+                if (roads[i].facility_id == facilityId && roads[i].type == typeName) {
+                    var roadID = roads[i].id;
+                    var newRoadData = {
+                        "title": roadID,
+                        "href": baiduMapUrl + '&selectedFacility=' + roadID
+                    };
+                    newTypeData.children.push(newRoadData);
+                }
+            }
+            newData.children.push(newTypeData);
+
+            var typeName = "匝道";
+            var newTypeData = {
+                "title": typeName,
+                "href": baiduMapUrl + '&selectedFacility=' + facilityId + '&selectedType=' + typeName,
+                "children": []
+            }
+            for (var i = 0; i < roads.length; i++) {
+                if (roads[i].facility_id == facilityId && roads[i].type == typeName) {
+                    var roadID = roads[i].id;
+                    var newRoadData = {
+                        "title": roadID,
+                        "href": baiduMapUrl + '&selectedFacility=' + roadID
+                    };
+                    newTypeData.children.push(newRoadData);
+                }
+            }
+            newData.children.push(newTypeData);
+
+            var typeName = "立交";
+            var newTypeData = {
+                "title": typeName,
+                "href": baiduMapUrl + '&selectedFacility=' + facilityId + '&selectedType=' + typeName,
+                "children": []
+            }
+            for (var i = 0; i < roads.length; i++) {
+                if (roads[i].facility_id == facilityId && roads[i].type == typeName) {
+                    var roadID = roads[i].id;
+                    var newRoadData = {
+                        "title": roadID,
+                        "href": baiduMapUrl + '&selectedFacility=' + roadID
+                    };
+                    newTypeData.children.push(newRoadData);
+                }
+            }
+            newData.children.push(newTypeData);
+            data.push(newData);
+        }
+        //点击节点新窗口跳转
+        tree.render({
+            elem: '#structure-tree'
+            , data: data
+            , isJump: true  //link 为参数匹配
+            ,onlyIconControl: true
+        });
+    })
+
 </script>
