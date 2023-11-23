@@ -203,7 +203,7 @@
         .toolbar-icon::after {
             content: attr(data-tooltip); /* 设置伪元素的内容 */
             position: absolute;
-            bottom: 100%; /* 位于图标的上方 */
+            bottom: -100%; /* 位于图标的上方 */
             left: 50%;
             transform: translateX(-50%);
             background-color: #333; /* 提示文本背景颜色 */
@@ -235,7 +235,7 @@
     .demo-tree {
         max-height: 750px; /* 设置最大高度，超出部分将出现滚动条 */
         overflow-y: auto; /* 显示垂直滚动条 */
-        max-width: 275px; /* 设置最大高度，超出部分将出现滚动条 */
+        max-width: 350px; /* 设置最大高度，超出部分将出现滚动条 */
         overflow-x: auto; /* 显示垂直滚动条 */
     }
     /* 隐藏默认的子树结构 */

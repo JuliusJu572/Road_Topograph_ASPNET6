@@ -50,8 +50,6 @@
                 <li class="layui-nav-item layui-hide-xs">
                     <a class="nav-link" asp-area="" asp-controller="Map" asp-action="SystemSettings">系统设置</a>
                 </li>
-
-
             </ul>
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item layui-hide layui-show-md-inline-block">
@@ -79,14 +77,15 @@
                     <li class="layui-nav-item layui-nav-itemed">
                         <a class="nav-link" asp-area="" asp-controller="Map" asp-action="BaiduMap">拓扑可视</a>
                     </li>
-                    <li class="layui-nav-item">
-                        <a href="javascript:;">道路设施</a>
-                        <dl class="layui-nav-child">
-                            <dd><a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraData">设施数据</a></dd>
-                            <dd><a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraStructure">设施管理</a></dd>
-                        </dl>
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraData">设施数据</a>
                     </li>
-                    <li class="layui-nav-item"><a class="nav-link" asp-area="" asp-controller="Map" asp-action="SystemSettings">系统设置</a></li>
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraStructure">设施管理</a>
+                    </li>
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="SystemSettings">系统设置</a>
+                    </li>
                 </ul>
             </div>
         </div>
