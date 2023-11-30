@@ -907,8 +907,6 @@ namespace RoadAppWEB.Controllers
                     foreach (node n in nodesFromRoad)
                     {
                         count4nodes++;
-                        // 如果 n.span 不为 null，则使用其值，否则使用 0.0
-                        span += (n.span != null) ? n.span.Value : 0.0;
                         if (roadTemp.type == "主线" || roadTemp.type == "立交")
                         {
                             if ((n.childnode.Contains(';') || n.fathernode.Contains(';') || n.id == roadTemp.end_node) && n.id != starthub_id)
@@ -934,6 +932,11 @@ namespace RoadAppWEB.Controllers
 
                                 starthub_id = n.id;
                                 span = 0;
+                            }
+                            else
+                            {
+                                // 如果 n.span 不为 null，则使用其值，否则使用 0.0
+                                span += (n.span != null) ? n.span.Value : 0.0;
                             }
                         }
                         else
@@ -962,6 +965,11 @@ namespace RoadAppWEB.Controllers
 
                                 span = 0;
                             }
+                            else
+                            {
+                                // 如果 n.span 不为 null，则使用其值，否则使用 0.0
+                                span += (n.span != null) ? n.span.Value : 0.0;
+                            }
                         }
                     }
 
@@ -971,7 +979,16 @@ namespace RoadAppWEB.Controllers
                         id = index++;
                         starthub_id = roadTemp.end_node;
                         endhub_id = roadTemp.end_linknode;
-                        span = 0;
+                        
+                        var startNode = _context.node.FirstOrDefault(node => node.id == starthub_id);
+                        if (startNode.span != 0 || startNode.span != null)
+                        {
+                            span = (double)startNode.span;
+                        }
+                        else
+                        {
+                            span = 0;
+                        }
                         velocity = 30;
                         direction = roadTemp.type;
                         type = roadTemp.type + "-" + roadTemp.type;
@@ -1005,7 +1022,16 @@ namespace RoadAppWEB.Controllers
                                     var checkNodeType = checkRoad.type;
                                     type = roadTemp.type + "-" + checkNodeType;
 
-                                    span = 0;
+                                    var startNode = _context.node.FirstOrDefault(node => node.id == starthub_id);
+                                    if (startNode.span != 0 || startNode.span != null)
+                                    {
+                                        span = (double)startNode.span;
+                                    }
+                                    else
+                                    {
+                                        span = 0;
+                                    }
+
                                     velocity = 30;
 
                                     newHubNodeRes = new HubNodeRes
@@ -1018,7 +1044,16 @@ namespace RoadAppWEB.Controllers
                                         velocity = velocity,
                                         type = type,
                                     };
-                                    hubNodeReses.Add(newHubNodeRes);
+                                    // 如果不包含
+                                    if (linkRelationship.Contains(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id) == false)
+                                    {
+                                        hubNodeReses.Add(newHubNodeRes);
+                                        linkRelationship.Add(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id);
+                                    }
+                                    else
+                                    {
+                                        index--;
+                                    }
                                 }
                             }
                             else
@@ -1032,7 +1067,16 @@ namespace RoadAppWEB.Controllers
                                 var checkNodeType = checkRoad.type;
                                 type = roadTemp.type + "-" + checkNodeType;
 
-                                span = 0;
+                                var startNode = _context.node.FirstOrDefault(node => node.id == starthub_id);
+                                if (startNode.span != 0 || startNode.span != null)
+                                {
+                                    span = (double)startNode.span;
+                                }
+                                else
+                                {
+                                    span = 0;
+                                }
+
                                 velocity = 30;
 
                                 newHubNodeRes = new HubNodeRes
@@ -1045,7 +1089,16 @@ namespace RoadAppWEB.Controllers
                                     velocity = velocity,
                                     type = type,
                                 };
-                                hubNodeReses.Add(newHubNodeRes);
+                                // 如果不包含
+                                if (linkRelationship.Contains(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id) == false)
+                                {
+                                    hubNodeReses.Add(newHubNodeRes);
+                                    linkRelationship.Add(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id);
+                                }
+                                else
+                                {
+                                    index--;
+                                }
                             }
                         }
                         if (roadTemp.start_linknode != null && roadTemp.start_linknode != "")
@@ -1065,7 +1118,16 @@ namespace RoadAppWEB.Controllers
                                     type = checkNodeType + "-" + roadTemp.type;
                                     direction = roadTemp.type;
 
-                                    span = 0;
+                                    var startNode = _context.node.FirstOrDefault(node => node.id == starthub_id);
+                                    if (startNode.span != 0 || startNode.span != null)
+                                    {
+                                        span = (double)startNode.span;
+                                    }
+                                    else
+                                    {
+                                        span = 0;
+                                    }
+
                                     velocity = 30;
 
                                     newHubNodeRes = new HubNodeRes
@@ -1078,7 +1140,16 @@ namespace RoadAppWEB.Controllers
                                         velocity = velocity,
                                         type = type,
                                     };
-                                    hubNodeReses.Add(newHubNodeRes);
+                                    // 如果不包含
+                                    if (linkRelationship.Contains(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id) == false)
+                                    {
+                                        hubNodeReses.Add(newHubNodeRes);
+                                        linkRelationship.Add(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id);
+                                    }
+                                    else
+                                    {
+                                        index--;
+                                    }
                                 }
                             }
                             else
@@ -1094,7 +1165,16 @@ namespace RoadAppWEB.Controllers
                                 type = checkNodeType + "-" + roadTemp.type;
                                 direction = roadTemp.type;
 
-                                span = 0;
+                                var startNode = _context.node.FirstOrDefault(node => node.id == starthub_id);
+                                if (startNode.span != 0 || startNode.span != null)
+                                {
+                                    span = (double)startNode.span;
+                                }
+                                else
+                                {
+                                    span = 0;
+                                }
+
                                 velocity = 30;
 
                                 newHubNodeRes = new HubNodeRes
@@ -1107,7 +1187,16 @@ namespace RoadAppWEB.Controllers
                                     velocity = velocity,
                                     type = type,
                                 };
-                                hubNodeReses.Add(newHubNodeRes);
+                                // 如果不包含
+                                if (linkRelationship.Contains(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id) == false)
+                                {
+                                    hubNodeReses.Add(newHubNodeRes);
+                                    linkRelationship.Add(newHubNodeRes.starthub_id + newHubNodeRes.endhub_id);
+                                }
+                                else
+                                {
+                                    index--;
+                                }
                             }
                         }
                         
@@ -1271,140 +1360,128 @@ namespace RoadAppWEB.Controllers
 
                 // AllNode
                 List<AllNodesRes> allNodesRes = new List<AllNodesRes>();
+                linkRelationship = new List<string>();
                 index = 1;
                 foreach (road roadTemp in roads)
                 {
                     // 主路段
                     double span2hub = 0;
                     double span = 0;
-                    var nodesFromRoad = from n in _context.node
-                                        where n.road_id == roadTemp.id
-                                        select n;
+                    var starthub_id = roadTemp.start_node;
+                    var endhub_id = roadTemp.end_node;
+                    var nodesFromRoad = (from n in _context.node
+                                         where n.road_id == roadTemp.id
+                                         orderby n.id ascending
+                                         select n).AsEnumerable();
+                    if (nodesFromRoad.Last().id != roadTemp.end_node)
+                    {
+                        nodesFromRoad = nodesFromRoad.Reverse();
+                    }
+
+                    var count4nodes = 0;
+                    var tempAllNodesRes = new List<AllNodesRes>();
+                    var hub_id = nodesFromRoad.First().id;
                     foreach (node n in nodesFromRoad)
                     {
-                        var id = index++;
-                        span = (n.span != null) ? n.span.Value : 0.0;
-                        // 如果 n.span 不为 null，则使用其值，否则使用 0.0
-                        span2hub += span;
-                        var node_id = n.id;
-                        var hub_id = roadTemp.end_node;
-                        var type = roadTemp.type;
-
-                        var direction = roadTemp.direction;
-
-                        AllNodesRes allNodesRes1 = new AllNodesRes
+                        count4nodes++;
+                        if (roadTemp.type == "主线" || roadTemp.type == "立交")
                         {
-                            id = id,
-                            node_id = node_id,
-                            hub_id = hub_id,
-                            span = span,
-                            span2hub = span2hub,
-                            direction = direction,
-                            type = type,
-                        };
-                        allNodesRes.Add(allNodesRes1);
-                    }
+                            if ((n.childnode.Contains(';') || n.fathernode.Contains(';') || n.id == roadTemp.end_node) && n.id != starthub_id)
+                            {
+                                var id = index++;
+                                var node_id = n.id;
+                                var type = roadTemp.type;
+                                var direction = roadTemp.direction;
 
-                    // 关联路段
-                    if (roadTemp.type == "主线")
-                    {
-                        var id = index++;
-                        var node_id = roadTemp.end_node;
-                        var hub_id = roadTemp.end_linknode;
-                        span = 0;
-                        var type = roadTemp.type + "-" + roadTemp.type;
-                        var direction = roadTemp.direction;
+                                foreach (AllNodesRes anr in tempAllNodesRes)
+                                {
+                                    anr.hub_id = hub_id;
+                                    allNodesRes.Add(anr);
+                                }
 
-                        AllNodesRes allNodesRes1 = new AllNodesRes
-                        {
-                            id = id,
-                            node_id = node_id,
-                            hub_id = hub_id,
-                            span = span,
-                            span2hub = span2hub,
-                            direction = direction,
-                            type = type,
-                        };
-                        allNodesRes.Add(allNodesRes1);
-                    }
-                    else if (roadTemp.type == "匝道")
-                    {
-                        var id = index++;
-                        var direction = roadTemp.direction;
-                        var node_id = "";
-                        var hub_id = "";
-                        var type = "";
+                                span = (n.span != null) ? n.span.Value : 0.0;
+                                AllNodesRes allNodesRes1 = new AllNodesRes
+                                {
+                                    id = id,
+                                    node_id = node_id,
+                                    hub_id = node_id,
+                                    span = span,
+                                    span2hub = 0,
+                                    direction = direction,
+                                    type = type,
+                                };
+                                allNodesRes.Add(allNodesRes1);
+                                
+                                tempAllNodesRes = new List<AllNodesRes>();
+                                hub_id = n.id;
+                                span2hub = span;
+                            }
+                            else
+                            {
+                                var id = index++;
+                                var node_id = n.id;
+                                var type = roadTemp.type;
+                                var direction = roadTemp.direction;
 
-                        if (roadTemp.end_linknode != null && roadTemp.end_linknode != "")
-                        {
-                            node_id = roadTemp.end_node;
-                            hub_id = roadTemp.end_linknode;
-                            type = roadTemp.type + "-" + "主线";
+                                // 如果 n.span 不为 null，则使用其值，否则使用 0.0
+                                span = (n.span != null) ? n.span.Value : 0.0;
+
+                                AllNodesRes allNodesRes1 = new AllNodesRes
+                                {
+                                    id = id,
+                                    node_id = node_id,
+                                    hub_id = hub_id,
+                                    span = span,
+                                    span2hub = span2hub,
+                                    direction = direction,
+                                    type = type,
+                                };
+                                tempAllNodesRes.Add(allNodesRes1);
+
+                                span2hub += span;
+                            }
                         }
                         else
                         {
-                            node_id = roadTemp.start_linknode;
-                            hub_id = roadTemp.start_node;
-                            type = "主线" + "-" + roadTemp.type;
-                        }
-                        span = 0;
-
-                        AllNodesRes allNodesRes1 = new AllNodesRes
-                        {
-                            id = id,
-                            node_id = node_id,
-                            hub_id = hub_id,
-                            span = span,
-                            span2hub = span2hub,
-                            direction = direction,
-                            type = type,
-                        };
-                        allNodesRes.Add(allNodesRes1);
-                    }
-                    else if (roadTemp.type == "立交")
-                    {
-                        if (roadTemp.end_linknode != null && roadTemp.end_linknode != "")
-                        {
-                            if (roadTemp.end_linknode.Contains(';'))
+                            if (count4nodes == nodesFromRoad.Count())
                             {
-                                foreach (string temp_end_linknode in roadTemp.end_linknode.Split(';'))
+                                var id = index++;
+                                var node_id = n.id;
+                                var type = roadTemp.type;
+                                var direction = roadTemp.direction;
+
+                                foreach (AllNodesRes anr in tempAllNodesRes)
                                 {
-                                    var id = index++;
-                                    var node_id = roadTemp.end_node;
-                                    var hub_id = temp_end_linknode;
-                                    var direction = roadTemp.direction;
-
-                                    var linknode = _context.node.FirstOrDefault(node => node.id == hub_id);
-                                    var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
-                                    var type = roadTemp.type + "-" + linknode_type.type;
-
-                                    span = 0;
-
-                                    AllNodesRes allNodesRes1 = new AllNodesRes
-                                    {
-                                        id = id,
-                                        node_id = node_id,
-                                        hub_id = hub_id,
-                                        span = span,
-                                        span2hub = span2hub,
-                                        direction = direction,
-                                        type = type,
-                                    };
-                                    allNodesRes.Add(allNodesRes1);
+                                    anr.hub_id = hub_id;
+                                    allNodesRes.Add(anr);
                                 }
+
+                                span = (n.span != null) ? n.span.Value : 0.0;
+                                AllNodesRes allNodesRes1 = new AllNodesRes
+                                {
+                                    id = id,
+                                    node_id = node_id,
+                                    hub_id = node_id,
+                                    span = span,
+                                    span2hub = span2hub,
+                                    direction = direction,
+                                    type = type,
+                                };
+                                allNodesRes.Add(allNodesRes1);
+
+                                tempAllNodesRes = new List<AllNodesRes>();
+                                hub_id = n.id;
+                                span = 0;
+                                span2hub = 0;
                             }
                             else
                             {
                                 var id = index++;
-                                var node_id = roadTemp.end_node;
-                                var hub_id = roadTemp.end_linknode;
+                                var node_id = n.id;
+                                var type = roadTemp.type;
                                 var direction = roadTemp.direction;
-
-                                var linknode = _context.node.FirstOrDefault(node => node.id == hub_id);
-                                var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
-                                var type = roadTemp.type + "-" + linknode_type.type;
-
-                                span = 0;
+                                // 如果 n.span 不为 null，则使用其值，否则使用 0.0
+                                span = (n.span != null) ? n.span.Value : 0.0;
 
                                 AllNodesRes allNodesRes1 = new AllNodesRes
                                 {
@@ -1416,67 +1493,361 @@ namespace RoadAppWEB.Controllers
                                     direction = direction,
                                     type = type,
                                 };
-                                allNodesRes.Add(allNodesRes1);
+                                tempAllNodesRes.Add(allNodesRes1);
+
+                                span2hub += span;
                             }
                         }
-                        if (roadTemp.start_linknode != null && roadTemp.start_linknode != "")
-                        {
-                            if (roadTemp.start_linknode.Contains(';'))
-                            {
-                                foreach (string temp_start_linknode in roadTemp.start_linknode.Split(';'))
-                                {
-                                    var id = index++;
-                                    var node_id = temp_start_linknode;
-                                    var hub_id = roadTemp.end_node;
-                                    var direction = roadTemp.direction;
-
-                                    var linknode = _context.node.FirstOrDefault(node => node.id == node_id);
-                                    var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
-                                    var type = linknode_type.type + "-" + roadTemp.type;
-
-                                    span = 0;
-
-                                    AllNodesRes allNodesRes1 = new AllNodesRes
-                                    {
-                                        id = id,
-                                        node_id = node_id,
-                                        hub_id = hub_id,
-                                        span = span,
-                                        span2hub = span2hub,
-                                        direction = direction,
-                                        type = type,
-                                    };
-                                    allNodesRes.Add(allNodesRes1);
-                                }
-                            }
-                            else
-                            {
-                                var id = index++;
-                                var node_id = roadTemp.start_linknode;
-                                var hub_id = roadTemp.end_node;
-                                var direction = roadTemp.direction;
-
-                                var linknode = _context.node.FirstOrDefault(node => node.id == node_id);
-                                var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
-                                var type = linknode_type.type + "-" + roadTemp.type;
-
-                                span = 0;
-
-                                AllNodesRes allNodesRes1 = new AllNodesRes
-                                {
-                                    id = id,
-                                    node_id = node_id,
-                                    hub_id = hub_id,
-                                    span = span,
-                                    span2hub = span2hub,
-                                    direction = direction,
-                                    type = type,
-                                };
-                                allNodesRes.Add(allNodesRes1);
-                            }
-                        }
-
                     }
+
+
+                    // 关联路段
+                    //if (roadTemp.type == "主线")
+                    //{
+                    //    var id = index++;
+                    //    var node_id = roadTemp.end_node;
+                    //    var hub_id = roadTemp.end_linknode;
+
+                    //    var startNode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //    if (startNode.span != 0 || startNode.span != null)
+                    //    {
+                    //        span = (double)startNode.span;
+                    //    }
+                    //    else
+                    //    {
+                    //        span = 0;
+                    //    }
+
+                    //    var type = roadTemp.type + "-" + roadTemp.type;
+                    //    var direction = roadTemp.direction;
+
+                    //    AllNodesRes allNodesRes1 = new AllNodesRes
+                    //    {
+                    //        id = id,
+                    //        node_id = node_id,
+                    //        hub_id = hub_id,
+                    //        span = span,
+                    //        span2hub = span2hub,
+                    //        direction = direction,
+                    //        type = type,
+                    //    };
+                    //    allNodesRes.Add(allNodesRes1);
+                    //}
+                    //else if (roadTemp.type == "匝道" || roadTemp.type == "立交")
+                    //{
+                    //    if (roadTemp.end_linknode != null && roadTemp.end_linknode != "")
+                    //    {
+                    //        if (roadTemp.end_linknode.Contains(';'))
+                    //        {
+                    //            foreach (string end_linknode_temp in roadTemp.end_linknode.Split(';'))
+                    //            {
+                    //                var id = index++;
+                    //                var direction = roadTemp.direction;
+                    //                var node_id = roadTemp.end_node;
+                    //                var hub_id = end_linknode_temp;
+                    //                var type = "";
+
+                    //                var checkNode = _context.node.FirstOrDefault(node => node.id == hub_id);
+                    //                var checkRoad = _context.road.FirstOrDefault(road => road.id == checkNode.road_id);
+                    //                var checkNodeType = checkRoad.type;
+                    //                type = roadTemp.type + "-" + checkNodeType;
+
+                    //                var startNode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //                if (startNode.span != 0 || startNode.span != null)
+                    //                {
+                    //                    span = (double)startNode.span;
+                    //                    span2hub = span;
+                    //                }
+                    //                else
+                    //                {
+                    //                    span = 0;
+                    //                    span2hub = span;
+                    //                }
+
+                    //                AllNodesRes allNodesRes1 = new AllNodesRes
+                    //                {
+                    //                    id = id,
+                    //                    node_id = node_id,
+                    //                    hub_id = hub_id,
+                    //                    span = span,
+                    //                    span2hub = span2hub,
+                    //                    direction = direction,
+                    //                    type = type,
+                    //                };
+                    //                // 如果不包含
+                    //                if (linkRelationship.Contains(allNodesRes1.node_id + allNodesRes1.hub_id) == false)
+                    //                {
+                    //                    allNodesRes.Add(allNodesRes1);
+                    //                    linkRelationship.Add(allNodesRes1.node_id + allNodesRes1.hub_id);
+                    //                }
+                    //                else
+                    //                {
+                    //                    index--;
+                    //                }
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            var id = index++;
+                    //            var direction = roadTemp.direction;
+                    //            var node_id = roadTemp.end_node;
+                    //            var hub_id = roadTemp.end_linknode;
+                    //            var type = "";
+
+                    //            var checkNode = _context.node.FirstOrDefault(node => node.id == hub_id);
+                    //            var checkRoad = _context.road.FirstOrDefault(road => road.id == checkNode.road_id);
+                    //            var checkNodeType = checkRoad.type;
+                    //            type = roadTemp.type + "-" + checkNodeType;
+
+                    //            var startNode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //            if (startNode.span != 0 || startNode.span != null)
+                    //            {
+                    //                span = (double)startNode.span;
+                    //                span2hub = span;
+                    //            }
+                    //            else
+                    //            {
+                    //                span = 0;
+                    //                span2hub = span;
+                    //            }
+
+                    //            AllNodesRes allNodesRes1 = new AllNodesRes
+                    //            {
+                    //                id = id,
+                    //                node_id = node_id,
+                    //                hub_id = hub_id,
+                    //                span = span,
+                    //                span2hub = span2hub,
+                    //                direction = direction,
+                    //                type = type,
+                    //            };
+                    //            // 如果不包含
+                    //            if (linkRelationship.Contains(allNodesRes1.node_id + allNodesRes1.hub_id) == false)
+                    //            {
+                    //                allNodesRes.Add(allNodesRes1);
+                    //                linkRelationship.Add(allNodesRes1.node_id + allNodesRes1.hub_id);
+                    //            }
+                    //            else
+                    //            {
+                    //                index--;
+                    //            }
+                    //        }
+                    //    }
+                    //    if (roadTemp.start_linknode != null && roadTemp.start_linknode != "")
+                    //    {
+                    //        if (roadTemp.start_linknode.Contains(';'))
+                    //        {
+                    //            foreach (string start_linknode_temp in roadTemp.start_linknode.Split(';'))
+                    //            {
+                    //                var id = index++;
+                    //                var direction = roadTemp.direction;
+                    //                var node_id = start_linknode_temp;
+                    //                var hub_id = roadTemp.start_node;
+                    //                var type = "";
+
+                    //                var checkNode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //                var checkRoad = _context.road.FirstOrDefault(road => road.id == checkNode.road_id);
+                    //                var checkNodeType = checkRoad.type;
+                    //                type = checkNodeType + "-" + roadTemp.type;
+
+                    //                var startNode = _context.node.FirstOrDefault(node => node.id == hub_id);
+                    //                if (startNode.span != 0 || startNode.span != null)
+                    //                {
+                    //                    span = (double)startNode.span;
+                    //                    span2hub = span;
+                    //                }
+                    //                else
+                    //                {
+                    //                    span = 0;
+                    //                    span2hub = span;
+                    //                }
+
+                    //                AllNodesRes allNodesRes1 = new AllNodesRes
+                    //                {
+                    //                    id = id,
+                    //                    node_id = node_id,
+                    //                    hub_id = hub_id,
+                    //                    span = span,
+                    //                    span2hub = span2hub,
+                    //                    direction = direction,
+                    //                    type = type,
+                    //                };
+                    //                // 如果不包含
+                    //                if (linkRelationship.Contains(allNodesRes1.node_id + allNodesRes1.hub_id) == false)
+                    //                {
+                    //                    allNodesRes.Add(allNodesRes1);
+                    //                    linkRelationship.Add(allNodesRes1.node_id + allNodesRes1.hub_id);
+                    //                }
+                    //                else
+                    //                {
+                    //                    index--;
+                    //                }
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            var id = index++;
+                    //            var direction = roadTemp.direction;
+                    //            var node_id = roadTemp.start_linknode;
+                    //            var hub_id = roadTemp.start_node;
+                    //            var type = "";
+
+                    //            var checkNode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //            var checkRoad = _context.road.FirstOrDefault(road => road.id == checkNode.road_id);
+                    //            var checkNodeType = checkRoad.type;
+                    //            type =  checkNodeType + "-" + roadTemp.type;
+
+                    //            var startNode = _context.node.FirstOrDefault(node => node.id == hub_id);
+                    //            if (startNode.span != 0 || startNode.span != null)
+                    //            {
+                    //                span = (double)startNode.span;
+                    //                span2hub = span;
+                    //            }
+                    //            else
+                    //            {
+                    //                span = 0;
+                    //                span2hub = span;
+                    //            }
+
+                    //            AllNodesRes allNodesRes1 = new AllNodesRes
+                    //            {
+                    //                id = id,
+                    //                node_id = node_id,
+                    //                hub_id = hub_id,
+                    //                span = span,
+                    //                span2hub = span2hub,
+                    //                direction = direction,
+                    //                type = type,
+                    //            };
+                    //            // 如果不包含
+                    //            if (linkRelationship.Contains(allNodesRes1.node_id + allNodesRes1.hub_id) == false)
+                    //            {
+                    //                allNodesRes.Add(allNodesRes1);
+                    //                linkRelationship.Add(allNodesRes1.node_id + allNodesRes1.hub_id);
+                    //            }
+                    //            else
+                    //            {
+                    //                index--;
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    //else if (roadTemp.type == "立交")
+                    //{
+                    //    if (roadTemp.end_linknode != null && roadTemp.end_linknode != "")
+                    //    {
+                    //        if (roadTemp.end_linknode.Contains(';'))
+                    //        {
+                    //            foreach (string temp_end_linknode in roadTemp.end_linknode.Split(';'))
+                    //            {
+                    //                var id = index++;
+                    //                var node_id = roadTemp.end_node;
+                    //                var hub_id = temp_end_linknode;
+                    //                var direction = roadTemp.direction;
+
+                    //                var linknode = _context.node.FirstOrDefault(node => node.id == hub_id);
+                    //                var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
+                    //                var type = roadTemp.type + "-" + linknode_type.type;
+
+                    //                span = 0;
+
+                    //                AllNodesRes allNodesRes1 = new AllNodesRes
+                    //                {
+                    //                    id = id,
+                    //                    node_id = node_id,
+                    //                    hub_id = hub_id,
+                    //                    span = span,
+                    //                    span2hub = span2hub,
+                    //                    direction = direction,
+                    //                    type = type,
+                    //                };
+                    //                allNodesRes.Add(allNodesRes1);
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            var id = index++;
+                    //            var node_id = roadTemp.end_node;
+                    //            var hub_id = roadTemp.end_linknode;
+                    //            var direction = roadTemp.direction;
+
+                    //            var linknode = _context.node.FirstOrDefault(node => node.id == hub_id);
+                    //            var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
+                    //            var type = roadTemp.type + "-" + linknode_type.type;
+
+                    //            span = 0;
+
+                    //            AllNodesRes allNodesRes1 = new AllNodesRes
+                    //            {
+                    //                id = id,
+                    //                node_id = node_id,
+                    //                hub_id = hub_id,
+                    //                span = span,
+                    //                span2hub = span2hub,
+                    //                direction = direction,
+                    //                type = type,
+                    //            };
+                    //            allNodesRes.Add(allNodesRes1);
+                    //        }
+                    //    }
+                    //    if (roadTemp.start_linknode != null && roadTemp.start_linknode != "")
+                    //    {
+                    //        if (roadTemp.start_linknode.Contains(';'))
+                    //        {
+                    //            foreach (string temp_start_linknode in roadTemp.start_linknode.Split(';'))
+                    //            {
+                    //                var id = index++;
+                    //                var node_id = temp_start_linknode;
+                    //                var hub_id = roadTemp.end_node;
+                    //                var direction = roadTemp.direction;
+
+                    //                var linknode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //                var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
+                    //                var type = linknode_type.type + "-" + roadTemp.type;
+
+                    //                span = 0;
+
+                    //                AllNodesRes allNodesRes1 = new AllNodesRes
+                    //                {
+                    //                    id = id,
+                    //                    node_id = node_id,
+                    //                    hub_id = hub_id,
+                    //                    span = span,
+                    //                    span2hub = span2hub,
+                    //                    direction = direction,
+                    //                    type = type,
+                    //                };
+                    //                allNodesRes.Add(allNodesRes1);
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            var id = index++;
+                    //            var node_id = roadTemp.start_linknode;
+                    //            var hub_id = roadTemp.end_node;
+                    //            var direction = roadTemp.direction;
+
+                    //            var linknode = _context.node.FirstOrDefault(node => node.id == node_id);
+                    //            var linknode_type = _context.road.FirstOrDefault(road => road.id == linknode.road_id);
+                    //            var type = linknode_type.type + "-" + roadTemp.type;
+
+                    //            span = 0;
+
+                    //            AllNodesRes allNodesRes1 = new AllNodesRes
+                    //            {
+                    //                id = id,
+                    //                node_id = node_id,
+                    //                hub_id = hub_id,
+                    //                span = span,
+                    //                span2hub = span2hub,
+                    //                direction = direction,
+                    //                type = type,
+                    //            };
+                    //            allNodesRes.Add(allNodesRes1);
+                    //        }
+                    //    }
+
+                    //}
                 }
                 await createHubNodeResFromList(hubNodeReses);
                 await createAllNodeResFromList(allNodesRes);

@@ -763,15 +763,22 @@
         for (var j = 0; j < facilities.length; j++) {
             var facilityId = facilities[j].id;
             var baiduMapUrl = '@Url.Action("BaiduMap", new { site = ViewData["site"] })';
+            var selectedFacilityTxt = "";
+            if ("@ViewData["site"]" == "" || "@ViewData["site"]" == null){
+                selectedFacilityTxt = "?selectedFacility=";
+            }
+            else{
+                selectedFacilityTxt = "&selectedFacility=";
+            }
             var newData = {
                 "title": facilityId,
-                "href": baiduMapUrl + '&selectedFacility=' + facilityId,
+                "href": baiduMapUrl + selectedFacilityTxt + facilityId,
                 "children":[]
             };
             var typeName = "主线";
             var newTypeData = {
                 "title": typeName,
-                "href": baiduMapUrl + '&selectedFacility=' + facilityId + '&selectedType=' + typeName,
+                "href": baiduMapUrl + selectedFacilityTxt + facilityId + '&selectedType=' + typeName,
                 "children": []
             }
             for (var i = 0; i < roads.length; i++) {
@@ -779,7 +786,7 @@
                     var roadID = roads[i].id;
                     var newRoadData = {
                         "title": roadID,
-                        "href": baiduMapUrl + '&selectedFacility=' + roadID
+                        "href": baiduMapUrl + selectedFacilityTxt + roadID
                     };
                     newTypeData.children.push(newRoadData);
                 }
@@ -789,7 +796,7 @@
             var typeName = "匝道";
             var newTypeData = {
                 "title": typeName,
-                "href": baiduMapUrl + '&selectedFacility=' + facilityId + '&selectedType=' + typeName,
+                "href": baiduMapUrl + selectedFacilityTxt + facilityId + '&selectedType=' + typeName,
                 "children": []
             }
             for (var i = 0; i < roads.length; i++) {
@@ -797,7 +804,7 @@
                     var roadID = roads[i].id;
                     var newRoadData = {
                         "title": roadID,
-                        "href": baiduMapUrl + '&selectedFacility=' + roadID
+                        "href": baiduMapUrl + selectedFacilityTxt + roadID
                     };
                     newTypeData.children.push(newRoadData);
                 }
@@ -807,7 +814,7 @@
             var typeName = "立交";
             var newTypeData = {
                 "title": typeName,
-                "href": baiduMapUrl + '&selectedFacility=' + facilityId + '&selectedType=' + typeName,
+                "href": baiduMapUrl + selectedFacilityTxt + facilityId + '&selectedType=' + typeName,
                 "children": []
             }
             for (var i = 0; i < roads.length; i++) {
@@ -815,7 +822,7 @@
                     var roadID = roads[i].id;
                     var newRoadData = {
                         "title": roadID,
-                        "href": baiduMapUrl + '&selectedFacility=' + roadID
+                        "href": baiduMapUrl + selectedFacilityTxt + roadID
                     };
                     newTypeData.children.push(newRoadData);
                 }
