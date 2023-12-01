@@ -8,5 +8,11 @@ namespace RoadAppWEB.Models.ViewModel
         public IEnumerable<node> Nodes { get; set; }
         public IEnumerable<road> Roads { get; set; }
         public IEnumerable<facility> Facilities { get; set; }
+
+        public IEnumerable<HubNodeRes> HubNodeReses{ get; set; }
+
+        public IEnumerable<AllNodesRes> AllNodesReses{ get; set; }
+
+        public IEnumerable<datadict> DataDicts{ get; set; }
     }
 }

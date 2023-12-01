@@ -4,7 +4,7 @@
 @inject IAntiforgery Antiforgery
 
 @{
-    ViewData["Title"] = "Infrastructure Data";
+    ViewData["Title"] = "Node Data";
 }
 <table class="layui-hide" id="demo" lay-filter="test"></table>
 
@@ -102,63 +102,51 @@
         originalSide.appendChild(newSideScroll);
     });
 
-    // Assuming facilities is an array of facility objects
-    var facilities = @Html.Raw(Json.Serialize(Model.Facilities));
+    // Assuming nodes is an array of node objects
+    var nodes = @Html.Raw(Json.Serialize(Model.Nodes));
 
-    // Define an empty array to store the transformed data
-    var dataFacilities = [];
+    // Create nData by mapping over nodes
+    var nData = nodes.map(node => ({
+        id: node.id,
+        hubnode: node.hubnode,
+        fathernode: node.fathernode,
+        childnode: node.childnode,
+        road_id: node.road_id,
+        level: node.level,
+        longitude: node.longitude,
+        latitude: node.latitude,
+        span: node.span
+    }));
 
-    // Iterate through each facility and transform the data
-    for (var i = 0; i < facilities.length; i++) {
-        var facility = facilities[i];
-
-        // Create a new object with desired properties
-        var fData = {
-            id: facility.id,
-            type: facility.type,
-            trunknetwork: facility.trunknetwork,
-            maintenanceunit: facility.maintenanceunit,
-            operatingunit: facility.operatingunit,
-            lanes: facility.lanes,
-            length: facility.length,
-            square: facility.square,
-            date: facility.date
-        };
-
-        // Add the new object to the data array
-        dataFacilities.push(fData);
-    }
 
     // layUI
     layui.use('table', function () {
         var table = layui.table;
         var limit = 10;
         // Check if the length of data is greater than 20
-        if (dataFacilities.length > 20) {
+        if (nData.length > 20) {
             limit = 20;
         }
         //第一个实例
         table.render({
             elem: '#demo'
             , height: 895
-            , data: dataFacilities
+            , data: nData
             , title: '用户表'
             , page: true //开启分页
             , toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
             , cols: [[ //表头
                 { type: 'checkbox', fixed: 'left' }
-                , { field: 'id', title: '设施名称', width: 200, sort: true, fixed: 'left'}
-                , { field: 'type', title: '类型', width: 200 }
-                , { field: 'trunknetwork', title: '主干路网', width: 200}
-                , { field: 'maintenanceunit', title: '养护单位', width: 200}
-                , { field: 'operatingunit', title: '运营单位', width: 200}
-                , { field: 'lanes', title: '车道数', width: 150, sort: true }
-                , { field: 'length', title: '长度', width: 150, sort: true }
-                , { field: 'square', title: '占地面积', width: 150, sort: true }
-                , { field: 'date', title: '竣工日期', width: 150}
+                , { field: 'id', title: '桩号名称', width: 200, sort: true, fixed: 'left' }
+                , { field: 'road_id', title: '所属路段', width: 200 }
+                , { field: 'fathernode', title: '父桩号', width: 200 }
+                , { field: 'childnode', title: '子桩号', width: 200 }
+                , { field: 'span', title: '间距', width: 150 }
+                , { field: 'longitude', title: '经度', width: 250 }
+                , { field: 'latitude', title: '维度', width: 250 }
+                , { field: 'level', title: '层级', width: 100 }
             ]]
             , limit: limit
         });
-        
     });
 </script>

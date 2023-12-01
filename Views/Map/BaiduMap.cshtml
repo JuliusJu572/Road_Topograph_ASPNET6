@@ -55,7 +55,7 @@
 </div>
 
 
-<div id="container" style="width: 100%; height: 800px;display: flex; align-items: center; justify-content: space-between;"></div>
+<div id="container" style="width: 100%; height: 845px;display: flex; align-items: center; justify-content: space-between;"></div>
 
 <div id="node-select-container" class="rounded-box">
     <!-- Render the Create partial view and pass the collection of facilities -->
@@ -89,6 +89,7 @@
 
     #search-input {
         width: 250px; /* 设置搜索输入框的宽度 */
+        height: 20px;
         border-radius: 10px; /* 调整这个值以设置圆角的大小 */
     }
 
@@ -128,7 +129,7 @@
 
     #node-select-container {
         position: absolute; /* 设置为绝对定位，相对于父容器定位 */
-        top: 5%; /* 将容器的顶部定位到父容器中间 */
+        top: 6%; /* 将容器的顶部定位到父容器中间 */
         left: 1%;
         width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
         height: auto; /* 或者设置为100%，根据内容自动调整高度 */
@@ -149,6 +150,7 @@
 
     #container {
         height: 100%;
+        width: 100%;
         background-color: #F2F2F2; /* Light gray background */
     }
 
@@ -229,46 +231,16 @@
     /* Add some padding and background color to the toolbar */
     #image-toolbar {
         background-color: #F2F2F2;
+        height: 30px;
         padding: 10px; /* Add padding around the icons */
     }
 
-    .demo-tree {
+    .demo-tree-more {
         max-height: 750px; /* 设置最大高度，超出部分将出现滚动条 */
         overflow-y: auto; /* 显示垂直滚动条 */
         max-width: 350px; /* 设置最大高度，超出部分将出现滚动条 */
         overflow-x: auto; /* 显示垂直滚动条 */
     }
-    /* 隐藏默认的子树结构 */
-    .road-list {
-        display: none;
-    }
-    /* Style the tree nodes */
-    .tree-node {
-        display: flex;
-        align-items: center;
-    }
-    /* 初始状态下隐藏所有类型为type-list的子树 */
-    .type-list {
-        display: none;
-    }
-
-    /* 样式化可折叠图标 */
-    .tree-icon {
-        width: 10px; /* 设置图标的宽度 */
-        height: 10px; /* 设置图标的高度 */
-        cursor: pointer; /* 鼠标光标样式为手型 */
-    }
-
-        /* 设置图标的初始状态为向右箭头 */
-        .tree-icon[data-expanded="true"] {
-            content: url('arrow-down-bold.png'); /* 切换图标为展开状态的图标 */
-        }
-
-        /* 设置图标的初始状态为向下箭头 */
-        .tree-icon[data-expanded="false"] {
-            content: url('arrow-right-bold.png'); /* 切换图标为折叠状态的图标 */
-        }
-
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -544,7 +516,7 @@
             marker = new BMapGL.Marker(point, { icon: darkblueMarker });
         }
 
-        var nodeTip = "节点名称:" + node.id + "\n所属路段:" + node.road_id + "\n父节点:"+node.fathernode+"\n子节点:"+node.childnode;
+        var nodeTip = "节点名称:" + node.id + "\n所属路段:" + node.road_id + "\n父节点:" + node.fathernode + "\n子节点:" + node.childnode;
         marker.setTitle(nodeTip);
         marker.enableClicking = true;
         map.addOverlay(marker);
@@ -700,29 +672,52 @@
     });
 
     $(document).ready(function () {
-        // 默认隐藏所有子树结构
-        $(".road-list").hide();
+        // 创建新的 HTML 内容
+        var newSideScroll = document.createElement('div');
+        newSideScroll.className = 'layui-side-scroll';
 
-        // 点击图标时展开/折叠子树
-        $(".facility-node .tree-icon").click(function () {
-            var childTree = $(this).closest("li").find(".type-list");
-            childTree.slideToggle();
+        // 创建新的左侧导航区域
+        var newNav = document.createElement('ul');
+        newNav.className = 'layui-nav layui-nav-tree';
+        newNav.setAttribute('lay-filter', 'test');
 
-            // 切换图标
-            $(this).attr("src", function (index, attr) {
-                return attr.endsWith("arrow-right-bold.png") ? "arrow-down-bold.png" : "arrow-right-bold.png";
-            });
+        // 创建导航项
+        var navItems = [
+            { action: 'BaiduMap', text: '拓扑可视' },
+        ];
+
+        navItems.forEach(function (item) {
+            var navItem = document.createElement('li');
+            navItem.className = 'layui-nav-item layui-nav-itemed';
+
+            var navLink = document.createElement('a');
+            navLink.className = 'nav-link';
+            var area = "";
+            var controller = "Map";
+            var action = item.action;
+            var route = "/" + controller + '/' + action;
+            if (action == "BaiduMap") {
+                navItem.className += " layui-this";
+                route = "/";
+            }
+
+            // 设置正确的 asp-page 属性
+            navLink.setAttribute('href', route);
+
+            navLink.innerText = item.text;
+
+            navItem.appendChild(navLink);
+            newNav.appendChild(navItem);
         });
-        // 点击图标时展开/折叠子树
-        $(".type-node .tree-icon").click(function () {
-            var childTree = $(this).closest("li").find(".road-list");
-            childTree.slideToggle();
 
-            // 切换图标
-            $(this).attr("src", function (index, attr) {
-                return attr.endsWith("arrow-right-bold.png") ? "arrow-down-bold.png" : "arrow-right-bold.png";
-            });
-        });
+        // 将新的左侧导航区域添加到新的 HTML 内容中
+        newSideScroll.appendChild(newNav);
+
+        // 获取原有的容器元素
+        var originalSide = document.getElementById('originalSide');
+
+        // 将新的 HTML 内容添加到原有容器元素中
+        originalSide.appendChild(newSideScroll);
     });
 
     document.getElementById("export-icon2").addEventListener("click", function () {
@@ -756,37 +751,77 @@
         });
     }
 
+    var allSelected = false;
+    var bottomTitles = "";
+
     layui.use(['tree', 'util'], function () {
+        // 勾选相应的checkBox
+        // 获取当前网站的 URL
+        const currentUrl = window.location.href;
+        // 解码 URL
+        const decodedUrl = decodeURIComponent(currentUrl);
+
+        // 使用 URLSearchParams 解析 URL 查询参数
+        const urlParams = new URLSearchParams(decodedUrl.split("?")[1]);
+        var roadNameList = [];
+        // 检查是否存在 "site" 参数
+        if (urlParams.has("site")) {
+            // 获取名为 "site" 的查询参数的值
+            const siteParamValue = urlParams.get("site");
+
+            // 使用分号拆分字符串为数组
+            roadNameList = siteParamValue.split("；");
+        }
+        console.log(roadNameList);
+
         var tree = layui.tree;
-        var data = [{ "title": "全部显示", "href": "@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "全部" })" },
-        { "title": "取消显示",  "href": "@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "" })"}]
+        var data = [{
+            "title": "全部显示",
+            "href": "@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "全部" })",
+            "id": "1-全部",
+            "spread": true,
+            "children": []
+        }];
+        // 添加树节点
         for (var j = 0; j < facilities.length; j++) {
             var facilityId = facilities[j].id;
             var baiduMapUrl = '@Url.Action("BaiduMap", new { site = ViewData["site"] })';
             var selectedFacilityTxt = "";
-            if ("@ViewData["site"]" == "" || "@ViewData["site"]" == null){
+            if ("@ViewData["site"]" == "" || "@ViewData["site"]" == null) {
                 selectedFacilityTxt = "?selectedFacility=";
             }
-            else{
+            else {
                 selectedFacilityTxt = "&selectedFacility=";
             }
             var newData = {
                 "title": facilityId,
                 "href": baiduMapUrl + selectedFacilityTxt + facilityId,
-                "children":[]
+                "id": "2-" + facilityId,
+                "children": [],
+                "spread": false,
             };
             var typeName = "主线";
             var newTypeData = {
                 "title": typeName,
                 "href": baiduMapUrl + selectedFacilityTxt + facilityId + '&selectedType=' + typeName,
-                "children": []
+                "id": "3-" + facilityId + "-" + typeName,
+                "children": [],
+                "spread": false,
             }
             for (var i = 0; i < roads.length; i++) {
                 if (roads[i].facility_id == facilityId && roads[i].type == typeName) {
                     var roadID = roads[i].id;
+                    var checkFlag = false;
+                    if (roadNameList.includes(roadID)) {
+                        checkFlag = true;
+                        newTypeData.spread = true;
+                        newData.spread = true;
+                    }
                     var newRoadData = {
                         "title": roadID,
-                        "href": baiduMapUrl + selectedFacilityTxt + roadID
+                        "href": baiduMapUrl + selectedFacilityTxt + roadID,
+                        "id": "4-" + facilityId + "-" + typeName + "-" + roadID,
+                        "checked": checkFlag,
                     };
                     newTypeData.children.push(newRoadData);
                 }
@@ -797,14 +832,24 @@
             var newTypeData = {
                 "title": typeName,
                 "href": baiduMapUrl + selectedFacilityTxt + facilityId + '&selectedType=' + typeName,
-                "children": []
+                "id": "3-" + facilityId + "-" + typeName,
+                "children": [],
+                "spread": false,
             }
             for (var i = 0; i < roads.length; i++) {
                 if (roads[i].facility_id == facilityId && roads[i].type == typeName) {
                     var roadID = roads[i].id;
+                    var checkFlag = false;
+                    if (roadNameList.includes(roadID)) {
+                        checkFlag = true;
+                        newTypeData.spread = true;
+                        newData.spread = true;
+                    }
                     var newRoadData = {
                         "title": roadID,
-                        "href": baiduMapUrl + selectedFacilityTxt + roadID
+                        "href": baiduMapUrl + selectedFacilityTxt + roadID,
+                        "id": "4-" + facilityId + "-" + typeName + "-" + roadID,
+                        "checked":checkFlag
                     };
                     newTypeData.children.push(newRoadData);
                 }
@@ -815,28 +860,91 @@
             var newTypeData = {
                 "title": typeName,
                 "href": baiduMapUrl + selectedFacilityTxt + facilityId + '&selectedType=' + typeName,
-                "children": []
+                "id": "3-" + facilityId + "-" + typeName,
+                "children": [],
+                "spread": false,
             }
             for (var i = 0; i < roads.length; i++) {
                 if (roads[i].facility_id == facilityId && roads[i].type == typeName) {
                     var roadID = roads[i].id;
+                    var checkFlag = false;
+                    if (roadNameList.includes(roadID)) {
+                        checkFlag = true;
+                        newTypeData.spread = true;
+                        newData.spread = true;
+                    }
                     var newRoadData = {
                         "title": roadID,
-                        "href": baiduMapUrl + selectedFacilityTxt + roadID
+                        "href": baiduMapUrl + selectedFacilityTxt + roadID,
+                        "id": "4-" + facilityId + "-" + typeName + "-" + roadID,
+                        "checked": checkFlag,
                     };
                     newTypeData.children.push(newRoadData);
                 }
             }
             newData.children.push(newTypeData);
-            data.push(newData);
+            data[0].children.push(newData);
         }
         //点击节点新窗口跳转
-        tree.render({
+        var aa =  tree.render({
             elem: '#structure-tree'
+            , id: 'structure-tree-demo'
             , data: data
-            , isJump: true  //link 为参数匹配
-            ,onlyIconControl: true
+            , isJump: false  //link 为参数匹配
+            , onlyIconControl: true
+            , showCheckbox: true  //是否显示复选框
         });
-    })
+        // 当有选中数据时，oncheck方法会重复执行，因此在渲染结束后再添加oncheck功能。
+        // 参考https://blog.csdn.net/distinctive_MAN/article/details/121746764
+        aa.config.oncheck = function (obj) {
+            if (obj.data.id === "1-全部") {
+                if (allSelected == false && obj.checked == true) {
+                    allSelected = true;
+                }
+                else {
+                    allSelected = false;
+                }
+            }
+            else {
+                allSelected = false;
+            }
 
+            var checkData = tree.getChecked('structure-tree-demo');
+            console.log(checkData);
+            function getBottomTitles(node) {
+                const titles = [];
+
+                function traverse(currentNode) {
+                    if (currentNode.children && currentNode.children.length > 0) {
+                        currentNode.children.forEach(traverse);
+                    } else {
+                        titles.push(currentNode.title);
+                    }
+                }
+
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(traverse);
+                } else {
+                    titles.push(node.title);
+                }
+
+                return titles.join("；");
+            }
+
+            if (checkData.length == 1) {
+                bottomTitles = getBottomTitles(checkData[0]);
+            }
+            else {
+                bottomTitles = "";
+            }
+
+            if (allSelected === true) {
+                // 如果为真，跳转到 /Map/?selectedFacility=全部
+                window.location.href = "/?selectedFacility=全部";
+            } else {
+                // 如果为假，跳转到 /Map/?site=bottomTitles
+                window.location.href = "/?site=" + encodeURIComponent(bottomTitles);
+            }
+        }
+    });
 </script>

@@ -70,25 +70,7 @@
             </ul>
         </div>
 
-        <div class="layui-side layui-bg-black">
-            <div class="layui-side-scroll">
-                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-                <ul class="layui-nav layui-nav-tree" lay-filter="test">
-                    <li class="layui-nav-item layui-nav-itemed">
-                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="BaiduMap">拓扑可视</a>
-                    </li>
-                    <li class="layui-nav-item layui-nav-itemed">
-                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraData">设施数据</a>
-                    </li>
-                    <li class="layui-nav-item layui-nav-itemed">
-                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraStructure">设施管理</a>
-                    </li>
-                    <li class="layui-nav-item layui-nav-itemed">
-                        <a class="nav-link" asp-area="" asp-controller="Map" asp-action="SystemSettings">系统设置</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <div class="layui-side layui-bg-black" id="originalSide"></div>
 
         <div class="layui-body">
             <div class="container">
@@ -98,15 +80,22 @@
             </div>
         </div>
 
-        <div class="layui-footer">
+        @*<div class="layui-footer">
             <div class="container">
                 &copy; 2023 - Road Topograph - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> - Designed by - Julius Ju
             </div>
-        </div>
+        </div>*@
     </div>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<style>
+    .layui-footer {
+        height: 30px;
+    }
+</style>
+
 <script src="~/lib/layui/layui.js"></script>
 <script>
     //JS

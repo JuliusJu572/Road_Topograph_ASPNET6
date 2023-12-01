@@ -201,26 +201,93 @@ namespace RoadAppWEB.Controllers
         public async Task<IActionResult> InfraData(FacilityRoadNode viewModel)
         {
             ViewData["SelectedNavItem"] = "InfraData";
-            var roads = from r in _context.road
-                        select r;
             var facilities = from f in _context.facility
                              select f;
 
 
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.Facilities = await facilities.ToListAsync();
+            return View(viewModel);
+        }
+        public async Task<IActionResult> RoadData(FacilityRoadNode viewModel)
+        {
+            ViewData["SelectedNavItem"] = "RoadData";
+            var roads = from r in _context.road
+                        select r;
+
             viewModel.Roads = await roads.ToListAsync();
 
             return View(viewModel);
         }
-        public async Task<IActionResult> InfraStructure()
+        public async Task<IActionResult> NodeData(FacilityRoadNode viewModel)
+        {
+            ViewData["SelectedNavItem"] = "NodeData";
+            var nodes = from r in _context.node
+                        select r;
+
+            // 将节点和 Facility 数据存储在 viewModel 中
+            viewModel.Nodes = await nodes.ToListAsync();
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> HubNodeData(FacilityRoadNode viewModel)
+        {
+            ViewData["SelectedNavItem"] = "HubNodeData";
+            var nodes = from r in _context.HubNodeRes
+                        select r;
+
+            // 将节点和 Facility 数据存储在 viewModel 中
+            viewModel.HubNodeReses = await nodes.ToListAsync();
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> AllNodeData(FacilityRoadNode viewModel)
+        {
+            ViewData["SelectedNavItem"] = "AllNodeData";
+            var nodes = from r in _context.AllNodesRes
+                        select r;
+
+            // 将节点和 Facility 数据存储在 viewModel 中
+            viewModel.AllNodesReses = await nodes.ToListAsync();
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> InfraStructure(FacilityRoadNode viewModel)
         {
             ViewData["SelectedNavItem"] = "InfraStructure";
-            return View();
+            var facilities = from f in _context.facility
+                             select f;
+
+
+            // 将节点和 Facility 数据存储在 viewModel 中
+            viewModel.Facilities = await facilities.ToListAsync();
+
+            return View(viewModel);
         }
         public async Task<IActionResult> SystemSettings()
         {
             ViewData["SelectedNavItem"] = "SystemSettings";
+            return View();
+        }
+        public async Task<IActionResult> DictData(FacilityRoadNode viewModel)
+        {
+            ViewData["SelectedNavItem"] = "DictData";
+
+            var dicts = from r in _context.datadict
+                        select r;
+
+
+            // 将节点和 Facility 数据存储在 viewModel 中
+            viewModel.DataDicts = await dicts.ToListAsync();
+
+            return View(viewModel);
+        }
+        public async Task<IActionResult> UserData()
+        {
+            ViewData["SelectedNavItem"] = "UserData";
             return View();
         }
         [HttpGet]
@@ -888,7 +955,7 @@ namespace RoadAppWEB.Controllers
                     }
 
                     // if no head -> sort? no tail -> sort?
-                    var velocity = 30;
+                    var velocity = "30";
                     var direction = roadTemp.type;
                     var type = roadTemp.type;
 
@@ -912,7 +979,7 @@ namespace RoadAppWEB.Controllers
                             if ((n.childnode.Contains(';') || n.fathernode.Contains(';') || n.id == roadTemp.end_node) && n.id != starthub_id)
                             {
                                 id = index++;
-                                velocity = 30;
+                                velocity = "30";
                                 direction = roadTemp.type;
                                 type = roadTemp.type;
                                 endhub_id = n.id;
@@ -946,7 +1013,7 @@ namespace RoadAppWEB.Controllers
                                 id = index++;
                                 starthub_id = roadTemp.start_node;
                                 endhub_id = roadTemp.end_node;
-                                velocity = 30;
+                                velocity = "30";
                                 direction = roadTemp.type;
                                 type = roadTemp.type;
 
@@ -989,7 +1056,7 @@ namespace RoadAppWEB.Controllers
                         {
                             span = 0;
                         }
-                        velocity = 30;
+                        velocity = "30";
                         direction = roadTemp.type;
                         type = roadTemp.type + "-" + roadTemp.type;
 
@@ -1032,7 +1099,7 @@ namespace RoadAppWEB.Controllers
                                         span = 0;
                                     }
 
-                                    velocity = 30;
+                                    velocity = "30";
 
                                     newHubNodeRes = new HubNodeRes
                                     {
@@ -1077,7 +1144,7 @@ namespace RoadAppWEB.Controllers
                                     span = 0;
                                 }
 
-                                velocity = 30;
+                                velocity = "30";
 
                                 newHubNodeRes = new HubNodeRes
                                 {
@@ -1128,7 +1195,7 @@ namespace RoadAppWEB.Controllers
                                         span = 0;
                                     }
 
-                                    velocity = 30;
+                                    velocity = "30";
 
                                     newHubNodeRes = new HubNodeRes
                                     {
@@ -1175,7 +1242,7 @@ namespace RoadAppWEB.Controllers
                                     span = 0;
                                 }
 
-                                velocity = 30;
+                                velocity = "30";
 
                                 newHubNodeRes = new HubNodeRes
                                 {
@@ -1219,7 +1286,7 @@ namespace RoadAppWEB.Controllers
                                     type = roadTemp.type + "-" + linknode_type.type;
 
                                     span = 0;
-                                    velocity = 30;
+                                    velocity = "30";
 
                                     newHubNodeRes = new HubNodeRes
                                     {
@@ -1255,7 +1322,7 @@ namespace RoadAppWEB.Controllers
                                 direction = roadTemp.type;
 
                                 span = 0;
-                                velocity = 30;
+                                velocity = "30";
 
                                 newHubNodeRes = new HubNodeRes
                                 {
@@ -1295,7 +1362,7 @@ namespace RoadAppWEB.Controllers
                                     direction = roadTemp.type;
 
                                     span = 0;
-                                    velocity = 30;
+                                    velocity = "30";
 
                                     newHubNodeRes = new HubNodeRes
                                     {
@@ -1331,7 +1398,7 @@ namespace RoadAppWEB.Controllers
                                 direction = roadTemp.type;
 
                                 span = 0;
-                                velocity = 30;
+                                velocity = "30";
 
                                 newHubNodeRes = new HubNodeRes
                                 {

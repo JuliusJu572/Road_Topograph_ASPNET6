@@ -1,10 +1,147 @@
 ﻿@using Microsoft.AspNetCore.Antiforgery
 @using RoadAppWEB.Models.ViewModel;
 @model FacilityRoadNode
+@inject IAntiforgery Antiforgery
 
 @{
-    ViewData["Title"] = "InfraStructure";
+    ViewData["Title"] = "Infrastructure Data";
 }
-<h2>Infrastructure Structure</h2>
+<table class="layui-hide" id="demo" lay-filter="test"></table>
 
-<p>Hello from our Infrastructure Structure!</p>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="structure">结构</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="delete">删除</a>
+</script>
+
+<script src="~/lib/layui/layui.js"></script>
+<script>
+    // 等待页面加载完成
+    document.addEventListener('DOMContentLoaded', function () {
+        // 创建新的 HTML 内容
+        var newSideScroll = document.createElement('div');
+        newSideScroll.className = 'layui-side-scroll';
+
+        // 创建新的左侧导航区域
+        var newNav = document.createElement('ul');
+        newNav.className = 'layui-nav layui-nav-tree';
+        newNav.setAttribute('lay-filter', 'test');
+
+        // 创建导航项
+        var navItems = [
+            { action: 'InfraStructure', text: '设施结构' },
+        ];
+
+        navItems.forEach(function (item) {
+            var navItem = document.createElement('li');
+            navItem.className = 'layui-nav-item layui-nav-itemed';
+
+            var navLink = document.createElement('a');
+            navLink.className = 'nav-link';
+            var area = "";
+            var controller = "Map";
+            var action = item.action;
+            var route = "/" + controller + '/' + action;
+            if (action == "@ViewData["SelectedNavItem"]") {
+                navItem.className += " layui-this";
+                route = "/";
+            }
+
+            // 设置正确的 asp-page 属性
+            navLink.setAttribute('href', route);
+
+            navLink.innerText = item.text;
+
+            navItem.appendChild(navLink);
+            newNav.appendChild(navItem);
+        });
+
+        // 将新的左侧导航区域添加到新的 HTML 内容中
+        newSideScroll.appendChild(newNav);
+
+        // 获取原有的容器元素
+        var originalSide = document.getElementById('originalSide');
+
+        // 将新的 HTML 内容添加到原有容器元素中
+        originalSide.appendChild(newSideScroll);
+    });
+    
+    // Assuming facilities is an array of facility objects
+    var facilities = @Html.Raw(Json.Serialize(Model.Facilities));
+
+    // Define an empty array to store the transformed data
+    var dataFacilities = [];
+
+    // Iterate through each facility and transform the data
+    for (var i = 0; i < facilities.length; i++) {
+        var facility = facilities[i];
+
+        // Create a new object with desired properties
+        var fData = {
+            id: facility.id,
+            type: facility.type,
+            trunknetwork: facility.trunknetwork,
+            maintenanceunit: facility.maintenanceunit,
+            operatingunit: facility.operatingunit,
+            lanes: facility.lanes,
+            length: facility.length,
+            square: facility.square,
+            date: facility.date
+        };
+
+        // Add the new object to the data array
+        dataFacilities.push(fData);
+    }
+
+    // layUI
+    layui.use('table', function () {
+        var table = layui.table;
+        var limit = 10;
+        // Check if the length of data is greater than 20
+        if (dataFacilities.length > 20) {
+            limit = 20;
+        }
+        //第一个实例
+        table.render({
+            elem: '#demo'
+            , height: 895
+            , data: dataFacilities
+            , title: '用户表'
+            , page: true //开启分页
+            , toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            , cols: [[ //表头
+                { type: 'checkbox', fixed: 'left' }
+                , { field: 'id', title: '设施名称', width: 200, sort: true, fixed: 'left' }
+                , { field: 'type', title: '类型', width: 100 }
+                , { field: 'trunknetwork', title: '主干路网', width: 200 }
+                , { field: 'maintenanceunit', title: '养护单位', width: 150 }
+                , { field: 'operatingunit', title: '运营单位', width: 150 }
+                , { field: 'lanes', title: '车道数', width: 120, sort: true }
+                , { field: 'length', title: '长度', width: 120, sort: true }
+                , { field: 'square', title: '占地面积', width: 120, sort: true }
+                , { field: 'date', title: '竣工日期', width: 120 }
+                , { fixed: 'right', width: 300, align: 'center', toolbar: '#barDemo' }
+            ]]
+            , limit: limit
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var data = obj.data //获得当前行数据
+                , layEvent = obj.event; //获得 lay-event 对应的值
+            if (layEvent === 'detail') {
+                layer.msg('查看操作');
+            } 
+            if (layEvent === 'structure') {
+                layer.msg('查看结构');
+            }
+            if (layEvent === 'edit') {
+                layer.msg('编辑');
+            }
+            if (layEvent === 'delete') {
+                layer.msg('删除了？');
+            }
+        });
+    });
+</script>

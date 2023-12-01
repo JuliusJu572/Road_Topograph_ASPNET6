@@ -1,0 +1,157 @@
+﻿@using Microsoft.AspNetCore.Antiforgery
+@using RoadAppWEB.Models.ViewModel;
+@model FacilityRoadNode
+@inject IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "Data Diction";
+}
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>道路类型</legend>
+</fieldset>
+<table class="layui-hide" id="type" lay-filter="test"></table>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>行车方向</legend>
+</fieldset>
+<table class="layui-hide" id="direction" lay-filter="test"></table>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>关联类型</legend>
+</fieldset>
+<table class="layui-hide" id="link-type" lay-filter="test"></table>
+
+
+<script src="~/lib/layui/layui.js"></script>
+<script>
+    // 等待页面加载完成
+    document.addEventListener('DOMContentLoaded', function () {
+        // 创建新的 HTML 内容
+        var newSideScroll = document.createElement('div');
+        newSideScroll.className = 'layui-side-scroll';
+
+        // 创建新的左侧导航区域
+        var newNav = document.createElement('ul');
+        newNav.className = 'layui-nav layui-nav-tree';
+        newNav.setAttribute('lay-filter', 'test');
+
+        var headItem1 = document.createElement('li');
+        headItem1.className = 'layui-nav-item';
+        var txtandicon1 = document.createElement('a');
+        txtandicon1.text = "系统设置";
+        var icon1 = document.createElement('i');
+        icon1.className = "layui-icon layui-icon-down layui-nav-more";
+        txtandicon1.appendChild(icon1);
+        headItem1.appendChild(txtandicon1);
+
+        var childClass1 = document.createElement('dl');
+        childClass1.className = 'layui-nav-child';
+        headItem1.appendChild(childClass1);
+
+        newNav.appendChild(headItem1);
+
+        // 创建导航项
+        var navItems = [
+            { action: 'SystemSettings', text: '系统设置' },
+            { action: 'DictData', text: '字典管理' },
+            { action: 'UserData', text: '用户管理' },
+        ];
+        var index = 1;
+        navItems.forEach(function (item) {
+            var navItem = document.createElement('dd');
+
+            var navLink = document.createElement('a');
+            var controller = "Map";
+            var action = item.action;
+            if (action == "@ViewData["SelectedNavItem"]") {
+                navItem.className = 'layui-this';
+                headItem1.className += " layui-nav-itemed";
+            }
+            var route = "/" + controller + '/' + action;
+
+            // 设置正确的 asp-page 属性
+            navLink.setAttribute('href', route);
+            navLink.innerText = item.text;
+            navItem.appendChild(navLink);
+
+            childClass1.appendChild(navItem);
+
+            index++;
+        });
+
+        // 将新的左侧导航区域添加到新的 HTML 内容中
+        newSideScroll.appendChild(newNav);
+
+        // 获取原有的容器元素
+        var originalSide = document.getElementById('originalSide');
+
+        // 将新的 HTML 内容添加到原有容器元素中
+        originalSide.appendChild(newSideScroll);
+    });
+
+    // Assuming dataDictList is a List<datadict>
+    var dataDictList = @Html.Raw(Json.Serialize(Model.DataDicts));
+
+    // Create dataDictData by mapping over dataDictList
+    var dataDictData = dataDictList.map(dataDict => ({
+        id: dataDict.id,
+        reference: dataDict.reference,
+        content: dataDict.content
+    }));
+
+    // Filter the data into three arrays based on the reference property
+    var typeDictData = dataDictData.filter(item => item.reference === "道路类型");
+    var directionDictData = dataDictData.filter(item => item.reference === "方向");
+    var linktypeDictData = dataDictData.filter(item => item.reference === "关联类型");
+
+    // layUI
+    layui.use('table', function () {
+        var table = layui.table;
+        var limit = 10;
+        // Check if the length of data is greater than 20
+        if (dataDictData.length > 20) {
+            limit = 20;
+        }
+        //第一个实例
+        table.render({
+            elem: '#type'
+            , height: 200
+            , data: typeDictData
+            , page: false //开启分页
+            , toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            , cols: [[ //表头
+                { type: 'checkbox', fixed: 'left' }
+                , { field: 'reference', title: '字典类型', width: 200, sort: true, fixed: 'left' }
+                , { field: 'content', title: '字典内容', width: 200 }
+            ]]
+        });
+        //第一个实例
+        table.render({
+            elem: '#direction'
+            , height: 250
+            , data: directionDictData
+            , page: false //开启分页
+            , toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            , cols: [[ //表头
+                { type: 'checkbox', fixed: 'left' }
+                , { field: 'reference', title: '字典类型', width: 200, sort: true, fixed: 'left' }
+                , { field: 'content', title: '字典内容', width: 200 }
+            ]]
+        });
+        //第一个实例
+        table.render({
+            elem: '#link-type'
+            , height: 250
+            , data: linktypeDictData
+            , page: false //开启分页
+            , toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            , cols: [[ //表头
+                { type: 'checkbox', fixed: 'left' }
+                , { field: 'reference', title: '字典类型', width: 200, sort: true, fixed: 'left' }
+                , { field: 'content', title: '字典内容', width: 200 }
+            ]]
+        });
+    });
+
+</script>

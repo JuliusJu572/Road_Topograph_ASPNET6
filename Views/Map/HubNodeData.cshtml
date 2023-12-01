@@ -4,7 +4,7 @@
 @inject IAntiforgery Antiforgery
 
 @{
-    ViewData["Title"] = "Infrastructure Data";
+    ViewData["Title"] = "HubNode Data";
 }
 <table class="layui-hide" id="demo" lay-filter="test"></table>
 
@@ -102,63 +102,49 @@
         originalSide.appendChild(newSideScroll);
     });
 
-    // Assuming facilities is an array of facility objects
-    var facilities = @Html.Raw(Json.Serialize(Model.Facilities));
+    // Assuming hubNodes is a List<HubNodeRes>
+    var hubNodes = @Html.Raw(Json.Serialize(Model.HubNodeReses));
 
-    // Define an empty array to store the transformed data
-    var dataFacilities = [];
+    // Create hubNodeData by mapping over hubNodes
+    var hubNodeData = hubNodes.map(hubNode => ({
+        id: hubNode.id,
+        starthub_id: hubNode.starthub_id,
+        endhub_id: hubNode.endhub_id,
+        span: hubNode.span,
+        velocity: hubNode.velocity,
+        direction: hubNode.direction,
+        type: hubNode.type
+    }));
 
-    // Iterate through each facility and transform the data
-    for (var i = 0; i < facilities.length; i++) {
-        var facility = facilities[i];
-
-        // Create a new object with desired properties
-        var fData = {
-            id: facility.id,
-            type: facility.type,
-            trunknetwork: facility.trunknetwork,
-            maintenanceunit: facility.maintenanceunit,
-            operatingunit: facility.operatingunit,
-            lanes: facility.lanes,
-            length: facility.length,
-            square: facility.square,
-            date: facility.date
-        };
-
-        // Add the new object to the data array
-        dataFacilities.push(fData);
-    }
 
     // layUI
     layui.use('table', function () {
         var table = layui.table;
         var limit = 10;
         // Check if the length of data is greater than 20
-        if (dataFacilities.length > 20) {
+        if (hubNodeData.length > 20) {
             limit = 20;
         }
         //第一个实例
         table.render({
             elem: '#demo'
             , height: 895
-            , data: dataFacilities
+            , data: hubNodeData
             , title: '用户表'
             , page: true //开启分页
             , toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
             , cols: [[ //表头
                 { type: 'checkbox', fixed: 'left' }
-                , { field: 'id', title: '设施名称', width: 200, sort: true, fixed: 'left'}
-                , { field: 'type', title: '类型', width: 200 }
-                , { field: 'trunknetwork', title: '主干路网', width: 200}
-                , { field: 'maintenanceunit', title: '养护单位', width: 200}
-                , { field: 'operatingunit', title: '运营单位', width: 200}
-                , { field: 'lanes', title: '车道数', width: 150, sort: true }
-                , { field: 'length', title: '长度', width: 150, sort: true }
-                , { field: 'square', title: '占地面积', width: 150, sort: true }
-                , { field: 'date', title: '竣工日期', width: 150}
+                , { field: 'id', title: '序号', width: 100, sort: true, fixed: 'left' }
+                , { field: 'starthub_id', title: '起始枢纽节点', width: 300 }
+                , { field: 'endhub_id', title: '终止枢纽节点', width: 300 }
+                , { field: 'span', title: '间距', width: 200 }
+                , { field: 'velocity', title: '限速', width: 200 }
+                , { field: 'direction', title: '方向', width: 150, sort: true }
+                , { field: 'type', title: '类型', width: 150, sort: true }
             ]]
             , limit: limit
         });
-        
+
     });
 </script>
