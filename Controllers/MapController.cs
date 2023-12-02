@@ -32,7 +32,7 @@ namespace RoadAppWEB.Controllers
     {
         private readonly RoadAppWEBContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
-
+        private string userName = "";
         public MapController(RoadAppWEBContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
@@ -46,7 +46,7 @@ namespace RoadAppWEB.Controllers
             return View();
         }
 
-        public async Task<IActionResult> BaiduMap(string site, FacilityRoadNode viewModel, string selectedFacility, string selectedRoad, string selectedType)
+        public async Task<IActionResult> BaiduMap(string site, FacilityRoadNode viewModel, string selectedFacility, string selectedRoad, string selectedType, string username)
         {
             var nodeIdToSelect = "JuRuibin00";
             var nodes = from n in _context.node
@@ -189,6 +189,7 @@ namespace RoadAppWEB.Controllers
             ViewData["roads"] = selectedRoad;
             ViewData["facility_list"] = facilities;
             ViewData["selectedType"] = selectedType;
+            ViewData["username"] = username;
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.Nodes = await nodes.ToListAsync();
             viewModel.Facilities = await facilities.ToListAsync();
@@ -198,7 +199,7 @@ namespace RoadAppWEB.Controllers
         }
 
 
-        public async Task<IActionResult> InfraData(FacilityRoadNode viewModel)
+        public async Task<IActionResult> InfraData(FacilityRoadNode viewModel, string username)
         {
             ViewData["SelectedNavItem"] = "InfraData";
             var facilities = from f in _context.facility
@@ -207,9 +208,11 @@ namespace RoadAppWEB.Controllers
 
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.Facilities = await facilities.ToListAsync();
+
+            ViewData["username"] = username;
             return View(viewModel);
         }
-        public async Task<IActionResult> RoadData(FacilityRoadNode viewModel)
+        public async Task<IActionResult> RoadData(FacilityRoadNode viewModel, string username)
         {
             ViewData["SelectedNavItem"] = "RoadData";
             var roads = from r in _context.road
@@ -217,9 +220,10 @@ namespace RoadAppWEB.Controllers
 
             viewModel.Roads = await roads.ToListAsync();
 
+            ViewData["username"] = username;
             return View(viewModel);
         }
-        public async Task<IActionResult> NodeData(FacilityRoadNode viewModel)
+        public async Task<IActionResult> NodeData(FacilityRoadNode viewModel, string username)
         {
             ViewData["SelectedNavItem"] = "NodeData";
             var nodes = from r in _context.node
@@ -228,10 +232,11 @@ namespace RoadAppWEB.Controllers
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.Nodes = await nodes.ToListAsync();
 
+            ViewData["username"] = username;
             return View(viewModel);
         }
 
-        public async Task<IActionResult> HubNodeData(FacilityRoadNode viewModel)
+        public async Task<IActionResult> HubNodeData(FacilityRoadNode viewModel, string username)
         {
             ViewData["SelectedNavItem"] = "HubNodeData";
             var nodes = from r in _context.HubNodeRes
@@ -240,10 +245,11 @@ namespace RoadAppWEB.Controllers
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.HubNodeReses = await nodes.ToListAsync();
 
+            ViewData["username"] = username;
             return View(viewModel);
         }
 
-        public async Task<IActionResult> AllNodeData(FacilityRoadNode viewModel)
+        public async Task<IActionResult> AllNodeData(FacilityRoadNode viewModel, string username)
         {
             ViewData["SelectedNavItem"] = "AllNodeData";
             var nodes = from r in _context.AllNodesRes
@@ -252,10 +258,11 @@ namespace RoadAppWEB.Controllers
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.AllNodesReses = await nodes.ToListAsync();
 
+            ViewData["username"] = username;
             return View(viewModel);
         }
 
-        public async Task<IActionResult> InfraStructure(FacilityRoadNode viewModel)
+        public async Task<IActionResult> InfraStructure(FacilityRoadNode viewModel, string username)
         {
             ViewData["SelectedNavItem"] = "InfraStructure";
             var facilities = from f in _context.facility
@@ -265,15 +272,18 @@ namespace RoadAppWEB.Controllers
             // 将节点和 Facility 数据存储在 viewModel 中
             viewModel.Facilities = await facilities.ToListAsync();
 
+            ViewData["username"] = username;
             return View(viewModel);
         }
-        public async Task<IActionResult> SystemSettings()
+        public async Task<IActionResult> SystemSettings(string username)
         {
+            ViewData["username"] = username;
             ViewData["SelectedNavItem"] = "SystemSettings";
             return View();
         }
-        public async Task<IActionResult> DictData(FacilityRoadNode viewModel)
+        public async Task<IActionResult> DictData(FacilityRoadNode viewModel, string username)
         {
+            ViewData["username"] = username;
             ViewData["SelectedNavItem"] = "DictData";
 
             var dicts = from r in _context.datadict
@@ -285,8 +295,9 @@ namespace RoadAppWEB.Controllers
 
             return View(viewModel);
         }
-        public async Task<IActionResult> UserData()
+        public async Task<IActionResult> UserData(string username)
         {
+            ViewData["username"] = username;
             ViewData["SelectedNavItem"] = "UserData";
             return View();
         }
@@ -2269,5 +2280,23 @@ namespace RoadAppWEB.Controllers
                 return BadRequest("操作失败");
             }
         }
+
+        [HttpPost]
+        public IActionResult GetUserInfo(int userid, string password)
+        {
+            var user = _context.user.FirstOrDefault(u => u.id == userid);
+
+            if (user != null && user.password == password)
+            {
+                userName = user.name;
+                // User found and password matches
+                return Json(new { success = true, username = userName});
+            }
+
+            // User not found or password doesn't match
+            Response.StatusCode = 400; // Bad Request
+            return Json(new { success = false });
+        }
+
     }
 }

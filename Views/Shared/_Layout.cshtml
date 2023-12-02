@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>路网拓扑工具 - Julius Ju</title>
+    <title>路网拓扑工具</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -31,7 +31,7 @@
 <body>
 
     <div class="layui-layout layui-layout-admin">
-        <div class="layui-header">
+        <div class="layui-header" id="layui-header">
             <div class="layui-logo layui-hide-xs layui-bg-black">路网拓扑</div>
             <!-- 头部区域（可配合layui 已有的水平导航） -->
             <ul class="layui-nav layui-layout-left">
@@ -40,22 +40,22 @@
                     <i class="layui-icon layui-icon-spread-left"></i>
                 </li>
 
-                <li class="layui-nav-item layui-hide-xs"><a class="nav-link" asp-area="" asp-controller="Map" asp-action="BaiduMap">拓扑可视</a></li>
+                <li class="layui-nav-item layui-hide-xs"><a class="nav-link" asp-area="" asp-controller="Map" asp-action="BaiduMap" asp-route-username="@ViewData["username"]">拓扑可视</a></li>
                 <li class="layui-nav-item layui-hide-xs">
-                    <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraData">设施数据</a>
+                    <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraData" asp-route-username="@ViewData["username"]">设施数据</a>
                 </li>
                 <li class="layui-nav-item layui-hide-xs">
-                    <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraStructure">设施管理</a>
+                    <a class="nav-link" asp-area="" asp-controller="Map" asp-action="InfraStructure" asp-route-username="@ViewData["username"]">设施管理</a>
                 </li>
                 <li class="layui-nav-item layui-hide-xs">
-                    <a class="nav-link" asp-area="" asp-controller="Map" asp-action="SystemSettings">系统设置</a>
+                    <a class="nav-link" asp-area="" asp-controller="Map" asp-action="SystemSettings" asp-route-username="@ViewData["username"]">系统设置</a>
                 </li>
             </ul>
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item layui-hide layui-show-md-inline-block">
-                    <a href="javascript:;">
+                    <a href="javascript:;" id="current-user-name">
                         <img src="~/用户.png" class="user-icon" style="width: 20px; height: 20px;">
-                        Julius Ju
+                        @(ViewData["username"] == null ? "未登录" : ViewData["username"])
                     </a>
                     <dl class="layui-nav-child">
                         <dd><a href="">个人中心</a></dd>
@@ -96,8 +96,10 @@
     }
 </style>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="~/lib/layui/layui.js"></script>
 <script>
+    
     //JS
     layui.use(['element', 'layer', 'util'], function () {
         var element = layui.element

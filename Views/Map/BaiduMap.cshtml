@@ -46,6 +46,7 @@
     </div>
     <!-- 搜索栏放在右侧 -->
     <form asp-controller="Map" asp-action="BaiduMap" method="get" style="display: flex; align-items: center;">
+        <input type="text" id="username-input" name="username" style="display:none">
         <input type="text" id="search-input" name="site" placeholder="Search...">
         <button type="submit" style="background: none; border: none; padding: 0;">
             <img src="~/搜索.png" alt="Search" style="width: 20px; height: 20px;">
@@ -56,6 +57,24 @@
 
 
 <div id="container" style="width: 100%; height: 845px;display: flex; align-items: center; justify-content: space-between;"></div>
+
+<
+<div id="login-overlay" class="rounded-box" style="align-items: center; display: none; justify-content: center; flex-direction: column;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input" id="usernameTxt">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input" id="passwordTxt">
+        </div>
+    </div>
+    <button class="layui-btn" id="loginBtn" style="margin-top: 10px;">登录</button>
+</div>
+
 
 <div id="node-select-container" class="rounded-box">
     <!-- Render the Create partial view and pass the collection of facilities -->
@@ -141,6 +160,17 @@
         position: absolute; /* 设置为绝对定位，相对于父容器定位 */
         top: 30%; /* 将容器的顶部定位到父容器中间 */
         left: 70%;
+        width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
+        height: auto; /* 或者设置为100%，根据内容自动调整高度 */
+        background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
+        z-index: 9999; /* 设置堆叠顺序高于 container */
+        display: none; /* 默认隐藏，根据需要显示 */
+    }
+
+    #login-overlay {
+        position: absolute; /* 设置为绝对定位，相对于父容器定位 */
+        top: 30%; /* 将容器的顶部定位到父容器中间 */
+        left: 35%;
         width: auto; /* 或者设置为100%，根据内容自动调整宽度 */
         height: auto; /* 或者设置为100%，根据内容自动调整高度 */
         background-color: rgba(255, 255, 255, 0.7); /* 设置背景颜色和透明度 */
@@ -241,6 +271,12 @@
         max-width: 350px; /* 设置最大高度，超出部分将出现滚动条 */
         overflow-x: auto; /* 显示垂直滚动条 */
     }
+
+    .disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -258,6 +294,15 @@
     const importIcon = document.getElementById("import-icon");
     const searchIcon = document.getElementById("search-icon");
     const searchInput = document.getElementById("search-input");
+    const usernameTxt = document.getElementById("usernameTxt");
+    const passwordTxt = document.getElementById("passwordTxt");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginTable = document.getElementById("login-overlay");
+
+    var currentUserUrl = window.location.origin;
+    if ("@ViewData["username"]" != null && "@ViewData["username"]" != "") {
+        currentUserUrl += "?username=" + "@ViewData["username"]";
+    }
 
     var fileInput = document.getElementById("file-input");
     var fileLabel = document.getElementById("file-label");
@@ -310,53 +355,6 @@
         styleId: '1a40647694017bcfc33ba2b48e15b105'
     });
     // MapSettings
-
-    // Test Examples
-    //var points = [
-    //    new BMapGL.Point(121.255683, 31.382652),
-    //    new BMapGL.Point(121.561367, 31.298901)
-    //    // Add more points here as needed
-    //];
-    //var labels = [
-    //    '上大嘉定',
-    //    '上理工'
-    //    // Add more labels here as needed
-    //];
-    //for (var i = 0; i < points.length; i++) {
-    //    var marker = new BMapGL.Marker(points[i]);
-    //    map.addOverlay(marker);
-    //    var label = new BMapGL.Label(labels[i], {
-    //        position: points[i],
-    //        offset: new BMapGL.Size(10, 10)
-    //    })
-    //    label.setStyle({
-    //        color: '#759879',
-    //        fontSize: '18px',
-    //        border: '1px solid #1a2e1c'
-    //    });
-    //    map.addOverlay(label);
-    //}
-    //var coordinates = [
-    //    new BMapGL.Point(121.558484, 31.296332),
-    //    new BMapGL.Point(121.558888, 31.296525),
-    //    new BMapGL.Point(121.559454, 31.29688),
-    //    new BMapGL.Point(121.559966, 31.297173),
-    //    new BMapGL.Point(121.560667, 31.297544),
-    //    new BMapGL.Point(121.561439, 31.298084),
-    //    new BMapGL.Point(121.562376, 31.298612),
-    //    new BMapGL.Point(121.562785, 31.298901)
-    //];
-    //for (var i = 0; i < coordinates.length; i++) {
-    //    var marker = new BMapGL.Marker(coordinates[i]);
-    //    map.addOverlay(marker);
-    //}
-    //var polyline = new BMapGL.Polyline(coordinates, {
-    //    strokeColor: "blue",
-    //    strokeWeight: 3,
-    //    strokeOpacity: 0.7
-    //});
-    //map.addOverlay(polyline);
-    // Test Examples
 
     // Buttons
     // Add Mode
@@ -471,7 +469,6 @@
                                 var newLatitude = routeNodes[i - 1].lat + fraction * (routeNodes[i].lat - routeNodes[i - 1].lat);
                                 var newLongitude = routeNodes[i - 1].lng + fraction * (routeNodes[i].lng - routeNodes[i - 1].lng);
                                 var point = new BMapGL.Point(newLongitude, newLatitude);
-                                console.log(point);
                                 var marker = new BMapGL.Marker(point, { icon: pinkMarker });
                                 map.addOverlay(marker);
                                 currentDistance += averageDistance;
@@ -672,6 +669,23 @@
     });
 
     $(document).ready(function () {
+        if ("@ViewData["username"]" != null && "@ViewData["username"]" != ""){
+            var currentUserTxt = document.getElementById('current-user-name');
+            currentUserTxt.innerText = "@ViewData["username"]";
+            hideOverlay();
+            // Assuming ViewData["username"] contains the desired value
+            var usernameValue = "@ViewData["username"]";
+
+            // Get the input element by its id
+            var usernameTxtbox = document.getElementById('username-input');
+
+            // Set the value of the input element
+            usernameTxtbox.value = usernameValue;
+        }
+        else{
+            showOverlay();
+        }
+
         // 创建新的 HTML 内容
         var newSideScroll = document.createElement('div');
         newSideScroll.className = 'layui-side-scroll';
@@ -695,10 +709,10 @@
             var area = "";
             var controller = "Map";
             var action = item.action;
-            var route = "/" + controller + '/' + action;
+            var route = "/" + controller + '/' + action + "/?username=" + "@ViewData["username"]";
             if (action == "BaiduMap") {
                 navItem.className += " layui-this";
-                route = "/";
+                route = "/?username=" + "@ViewData["username"]";
             }
 
             // 设置正确的 asp-page 属性
@@ -772,12 +786,11 @@
             // 使用分号拆分字符串为数组
             roadNameList = siteParamValue.split("；");
         }
-        console.log(roadNameList);
 
         var tree = layui.tree;
         var data = [{
             "title": "全部显示",
-            "href": "@Url.Action("BaiduMap", new { site = ViewData["site"], selectedFacility = "全部" })",
+            "href": "@Url.Action("BaiduMap", new { site = @ViewData["site"], selectedFacility = "全部" })",
             "id": "1-全部",
             "spread": true,
             "children": []
@@ -849,7 +862,7 @@
                         "title": roadID,
                         "href": baiduMapUrl + selectedFacilityTxt + roadID,
                         "id": "4-" + facilityId + "-" + typeName + "-" + roadID,
-                        "checked":checkFlag
+                        "checked": checkFlag
                     };
                     newTypeData.children.push(newRoadData);
                 }
@@ -886,7 +899,7 @@
             data[0].children.push(newData);
         }
         //点击节点新窗口跳转
-        var aa =  tree.render({
+        var aa = tree.render({
             elem: '#structure-tree'
             , id: 'structure-tree-demo'
             , data: data
@@ -910,7 +923,6 @@
             }
 
             var checkData = tree.getChecked('structure-tree-demo');
-            console.log(checkData);
             function getBottomTitles(node) {
                 const titles = [];
 
@@ -940,11 +952,96 @@
 
             if (allSelected === true) {
                 // 如果为真，跳转到 /Map/?selectedFacility=全部
-                window.location.href = "/?selectedFacility=全部";
+                window.location.href = currentUserUrl + "&selectedFacility=全部";
             } else {
+                console.log(window.location.origin)
                 // 如果为假，跳转到 /Map/?site=bottomTitles
-                window.location.href = "/?site=" + encodeURIComponent(bottomTitles);
+                window.location.href = currentUserUrl + "&site=" + encodeURIComponent(bottomTitles);
             }
         }
     });
+
+    document.addEventListener('click', function (event) {
+        var currentUserTxt = document.getElementById('current-user-name');
+        if (currentUserTxt && currentUserTxt.innerText.trim() === '未登录') {
+            // User is not logged in, show the login overlay
+            showOverlay();
+        }
+    });
+
+    function showOverlay() {
+        var overlay = document.getElementById('login-overlay');
+        overlay.style.display = 'flex';
+
+        // Disable specific elements
+        var disabledElements = document.querySelectorAll('#image-toolbar, #container, #layui-header, #originalSide');
+        disabledElements.forEach(function (element) {
+            element.classList.add('disabled');
+        });
+    }
+
+    function hideOverlay() {
+        var overlay = document.getElementById('login-overlay');
+        overlay.style.display = 'none';
+
+        // Enable specific elements
+        var disabledElements = document.querySelectorAll('#image-toolbar, #container, #layui-header, #originalSide');
+        disabledElements.forEach(function (element) {
+            element.classList.remove('disabled');
+        });
+    }
+
+
+    loginBtn.addEventListener("click", login);
+
+    document.addEventListener("keydown", function (event) {
+        // Check if the pressed key is Enter
+        if (event.key === "Enter") {
+            // Prevent the default behavior (e.g., form submission)
+            event.preventDefault();
+            // Call the login function
+            login();
+        }
+    });
+
+    function login() {
+        var userid = document.getElementById('usernameTxt').value.trim();
+        var password = document.getElementById('passwordTxt').value.trim();
+        var currentUserTxt = document.getElementById('current-user-name');
+
+        if (userid && password) {
+            var formData = new FormData();
+            formData.append("userid", userid);
+            formData.append("password", password);
+
+            fetch("/Map/GetUserInfo", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("账号或密码错误！");
+                    }
+                    return response.json(); // Parse the JSON data
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert("登录成功！");
+                        currentUserTxt.innerText = data.username;
+                        console.log(data.username);
+                        hideOverlay();
+                        // Redirect to a new page with the username parameter
+                        var newHref = window.location.origin + "?username=" + encodeURIComponent(data.username);
+                        window.location.href = newHref;
+                    } else {
+                        alert("账号或密码错误！");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert(error.message);
+                });
+        }
+    }
+
 </script>

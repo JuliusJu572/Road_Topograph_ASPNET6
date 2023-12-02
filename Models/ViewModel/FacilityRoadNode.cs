@@ -5,6 +5,7 @@ namespace RoadAppWEB.Models.ViewModel
 {
     public class FacilityRoadNode
     {
+        public IEnumerable<user> users { get; set; }
         public IEnumerable<node> Nodes { get; set; }
         public IEnumerable<road> Roads { get; set; }
         public IEnumerable<facility> Facilities { get; set; }

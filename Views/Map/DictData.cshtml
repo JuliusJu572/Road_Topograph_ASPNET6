@@ -68,7 +68,7 @@
                 navItem.className = 'layui-this';
                 headItem1.className += " layui-nav-itemed";
             }
-            var route = "/" + controller + '/' + action;
+            var route = "/" + controller + '/' + action + '/?username=' + "@ViewData["username"]";
 
             // 设置正确的 asp-page 属性
             navLink.setAttribute('href', route);

@@ -33,5 +33,6 @@ namespace RoadAppWEB.Data
         public DbSet<AllNodesRes>? AllNodesRes { get; set; }
 
         public DbSet<RoadAppWEB.Models.HubNodeRes>? HubNodeRes { get; set; }
+        public DbSet<RoadAppWEB.Models.user>? user { get; set; }
     }
 }

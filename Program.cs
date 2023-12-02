@@ -42,6 +42,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Map}/{action=BaiduMap}/{id?}");
+    pattern: "{controller=Map}/{action=BaiduMap}/{username?}");
 
 app.Run();

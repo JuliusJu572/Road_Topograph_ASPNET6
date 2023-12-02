@@ -42,10 +42,9 @@
             var area = "";
             var controller = "Map";
             var action = item.action;
-            var route = "/" + controller + '/' + action;
+            var route = "/" + controller + '/' + action + "/?username=" + "@ViewData["username"]";
             if (action == "@ViewData["SelectedNavItem"]") {
                 navItem.className += " layui-this";
-                route = "/";
             }
 
             // 设置正确的 asp-page 属性

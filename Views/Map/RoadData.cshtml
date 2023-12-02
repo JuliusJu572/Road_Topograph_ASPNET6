@@ -11,6 +11,7 @@
 
 <script src="~/lib/layui/layui.js"></script>
 <script>
+    
     // 等待页面加载完成
     document.addEventListener('DOMContentLoaded', function () {
         // 创建新的 HTML 内容
@@ -75,7 +76,7 @@
                     headItem2.className += " layui-nav-itemed";
                 }
             }
-            var route = "/" + controller + '/' + action;
+            var route = "/" + controller + '/' + action + '/?username=' + "@ViewData["username"]";
 
             // 设置正确的 asp-page 属性
             navLink.setAttribute('href', route);
