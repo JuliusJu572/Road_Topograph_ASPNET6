@@ -513,7 +513,10 @@
             marker = new BMapGL.Marker(point, { icon: darkblueMarker });
         }
 
-        var nodeTip = "节点名称:" + node.id + "\n所属路段:" + node.road_id + "\n父节点:" + node.fathernode + "\n子节点:" + node.childnode;
+        var nodeTip = "节点名称:" + node.id + "\t" +
+            "所属路段:" + node.road_id + "\n" +
+            "父节点:" + node.fathernode + "\n" +
+            "子节点:" + node.childnode;
         marker.setTitle(nodeTip);
         marker.enableClicking = true;
         map.addOverlay(marker);
